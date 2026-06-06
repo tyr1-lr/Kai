@@ -11,10 +11,103 @@ function Dashboard(){
 
     let greeting;
 
-    const name = "User"; 
-    const total_tasks = 5;
-    const total_notes = 4;
-    const total_chats = 8;
+    const name = "User";
+    
+    const tasks = [
+        {
+            id: 1,
+            title: "Study Django Models",
+            priority: "High",
+            done: false,
+        },
+        {
+            id: 2,
+            title: "Build Kai Backend",
+            priority: "Medium",
+            done: false,
+        },
+        {
+            id: 3,
+            title: "Learn React Basics",
+            priority: "Low",
+            done: true,
+        },
+    ];
+    const total_tasks = tasks.length;
+
+    const notes = [
+        {
+            id: 1,
+            title: "Django Models Overview",
+            created_at: "2026-06-03",
+            color: "text-purple-600"
+        },
+        {
+            id: 2,
+            title: "API Design Plan",
+            created_at: "2026-06-02",
+            color: "text-blue-600"
+        },
+        {
+            id: 3,
+            title: "React Components",
+            created_at: "2026-06-01",
+            color: "text-green-600"
+        }
+    ];
+    const total_notes = notes.length;
+
+    const chats = [
+        {
+            id: 1,
+            title: "Django Authentication",
+            created_at: "2026-06-05",
+            messages: 12
+        },
+        {
+            id: 2,
+            title: "React State Management",
+            created_at: "2026-06-05",
+            messages: 8
+        },
+        {
+            id: 3,
+            title: "Kai Feature Ideas",
+            created_at: "2026-06-04",
+            messages: 21
+        },
+        {
+            id: 4,
+            title: "REST API Design",
+            created_at: "2026-06-04",
+            messages: 15
+        },
+        {
+            id: 5,
+            title: "Tailwind Layout Help",
+            created_at: "2026-06-03",
+            messages: 10
+        },
+        {
+            id: 6,
+            title: "Database Schema Planning",
+            created_at: "2026-06-02",
+            messages: 18
+        },
+        {
+            id: 7,
+            title: "Learning Flask",
+            created_at: "2026-06-01",
+            messages: 7
+        },
+        {
+            id: 8,
+            title: "Project Deployment",
+            created_at: "2026-05-31",
+            messages: 11
+        }
+    ];
+    const total_chats = chats.length;
 
     if (hour < 12) {
         greeting = "Good Morning";
@@ -146,62 +239,41 @@ function Dashboard(){
                         </div>
 
                         <ul>
-                            <li
-                                onClick={() => console.log("open task")}
-                                className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
+                            {tasks.map((task) => {
+                                let priorityColor;
 
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 ml-6 accent-red-500 cursor-pointer"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
+                                if (task.priority === "High") {
+                                    priorityColor = "bg-red-500/20 text-red-700";
+                                } else if (task.priority === "Medium") {
+                                    priorityColor = "bg-orange-500/20 text-orange-700";
+                                } else {
+                                    priorityColor = "bg-green-500/20 text-green-700";
+                                }
 
-                                <span className="ml-3 text-white">
-                                    Study Django Models
-                                </span>
+                                return (
+                                    <li
+                                        key={task.id}
+                                        onClick={() => console.log("open task")}
+                                        className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            className="h-5 w-5 ml-6 accent-red-500 cursor-pointer"
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
 
-                                <span className="bg-red-500/20 px-2 py-1 rounded ml-auto text-xs text-red-700 font-bold">
-                                    High
-                                </span>
-                            </li>
+                                        <span className="ml-3 text-white">
+                                            {task.title}
+                                        </span>
 
-                            <li
-                                onClick={() => console.log("open task")}
-                                className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
-
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 ml-6 accent-red-500 cursor-pointer"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
-
-                                <span className="ml-3 text-white">
-                                    Build Kai Backend
-                                </span>
-
-                                <span className="bg-orange-500/20 text-orange-700 px-2 py-1 rounded ml-auto text-xs font-bold">
-                                    Medium
-                                </span>
-                            </li>
-
-                            <li
-                                onClick={() => console.log("open task")}
-                                className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
-
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 ml-6 accent-red-500 cursor-pointer"
-                                    onClick={(e) => e.stopPropagation()}
-                                />
-
-                                <span className="ml-3 text-white">
-                                    Learn React Basics
-                                </span>
-
-                                <span className="bg-green-500/20 text-green-700 px-2 py-1 rounded ml-auto text-xs font-bold">
-                                    Low
-                                </span>
-                            </li>
+                                        <span
+                                            className={`${priorityColor} px-2 py-1 rounded ml-auto text-xs font-bold`}
+                                        >
+                                            {task.priority}
+                                        </span>
+                                    </li>
+                                );
+                            })}
                         </ul>
 
                         <a href="#" className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">
@@ -215,8 +287,6 @@ function Dashboard(){
                     
                     </div>
 
-
-
                     <div className="bg-[#131A29] rounded-xl flex flex-col">
                         <div className="flex flex-grow p-4 border-b border-[#263248]">
                             <h1 className=" mt-1 text-lg text-white">
@@ -227,50 +297,22 @@ function Dashboard(){
                         </div>
 
                         <ul>
-                            <li
+                            {notes.map((note) => (
+                                <li
                                 onClick={() => console.log("open task")}
                                 className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-800 ml-6"><path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/><rect width="16" height="18" x="4" y="4" rx="2"/><path d="M8 10h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${note.color} ml-6`}><path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/><rect width="16" height="18" x="4" y="4" rx="2"/><path d="M8 10h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
 
                                 <span className="ml-3 text-white">
-                                    Django Models Overview
+                                    {note.title}
                                 </span>
 
                                 <span className="px-2 py-1 ml-auto text-xs text-white">
-                                    June 3
+                                    {note.created_at}
                                 </span>
-                            </li>
-
-                            <li
-                                onClick={() => console.log("open task")}
-                                className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600 ml-6"><path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/><rect width="16" height="18" x="4" y="4" rx="2"/><path d="M8 10h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
-
-                                <span className="ml-3 text-white">
-                                    API Design Plan
-                                </span>
-
-                                <span className="px-2 py-1 ml-auto text-xs text-white">
-                                    June 2
-                                </span>
-                            </li>
-
-                            <li
-                                onClick={() => console.log("open task")}
-                                className="flex h-16 border-b border-[#263248] w-full px-2 items-center cursor-pointer hover:bg-[#1f2a3d]">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white ml-6"><path d="M8 2v4"/><path d="M12 2v4"/><path d="M16 2v4"/><rect width="16" height="18" x="4" y="4" rx="2"/><path d="M8 10h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
-
-                                <span className="ml-3 text-white">
-                                    React Components
-                                </span>
-
-                                <span className="px-2 py-1 ml-auto text-xs text-white">
-                                    June 1
-                                </span>
-                            </li>
+                                </li>
+                            ))}
                         </ul>
 
                         <a href="#" className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">

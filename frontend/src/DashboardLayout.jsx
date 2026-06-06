@@ -7,7 +7,7 @@ function DashboardLayout ({ children }){
             <aside>
                 <Sidebar />
             </aside>
-            <main className="flex-1 w-full bg-[#0D1020]">
+            <main className="flex-1 relative w-full bg-[#0D1020]">
                 {children}
             </main>
         </div>
