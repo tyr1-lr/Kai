@@ -5,7 +5,7 @@ function Sidebar (){
     const [active, setActive] = useState("Dashboard");
 
     return(
-        <div className="h-screen border w-56 border-black flex flex-col p-2 bg-[#0D0A1F]">
+        <div className="h-screen border w-56 border-[#2A3145] flex flex-col p-2 bg-[#0D0A1F]">
             <div className="flex flex-row">
                 <img src={logo} alt="Logo" className="w-16 h-16" />
                 <h1 className="m-3 text-2xl text-white">

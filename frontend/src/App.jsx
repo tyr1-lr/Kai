@@ -3,11 +3,12 @@ import DashboardLayout from './DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Notes from './pages/Notes';
+import AIChat from './pages/AIChat';
 
 function App() {
   return (
     <DashboardLayout>
-      <Notes />
+      <AIChat />
     </DashboardLayout>
   );
 
