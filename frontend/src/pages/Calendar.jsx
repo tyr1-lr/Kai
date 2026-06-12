@@ -278,11 +278,13 @@ function Calendar() {
     const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
 
     return (
-        <div className="p-4 bg-[#0D1020] min-h-screen text-white">
-            <h1 className="text-3xl font-bold mb-4">Calendar</h1>
- 
-            <div className="flex flex-row h-12 text-lg">
-                <div className="w-300 flex flex-row h-12 text-lg items-center justify-center gap-2">
+        <div className="p-4 bg-[#0D1020] h-[695px] w-[1305px] text-white">
+            <div className="text-3xl font-bold mb-2">
+                <h1 className="">Calendar</h1>
+            </div>
+            
+            <div className="flex flex-row h-[30px] items-center">
+                <div className="w-300 flex flex-row h-[10px] text-base items-center justify-center gap-2">
                     <button
                     onClick={prevMonth}
                     className="cursor-pointer hover:text-[#2A3145]">
@@ -301,7 +303,7 @@ function Calendar() {
                 <div className=" flex flex-row ml-auto">
                     <button 
                      onClick={() => setIsEventModalOpen(true)}
-                    className="h-12 w-40 mr-10 flex ml-auto items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]">
+                    className="h-12 w-36 mr-10 flex ml-auto items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M5 12h14"/>
                             <path d="M12 5v14"/>
@@ -312,9 +314,9 @@ function Calendar() {
                 </div>
             </div>
 
-            <div className="flex flex-row w-full mt-4 h-full px-4 gap-4">
-                <div className="flex flex-col gap-4">
-                    <div className="w-250 border border-white/10 rounded-md">
+            <div className="flex flex-row mt-4 h-[575px] w-[910px] px-2 gap-2">
+                <div className="flex flex-col gap-4 w-[895px] shrink-0">
+                    <div className="w-[895px] h-[590px] border border-white/10 rounded-md">
                         <div className="grid grid-cols-7 border-t bg-[#121726] border-white/10">
                             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
                                 <div key={day} className="p-3 text-center text-gray-400 border-b border-white/10">
@@ -332,7 +334,7 @@ function Calendar() {
                                 return(
                                     <div
                                         key={idx}
-                                        className={`h-19 border border-white/10 p-2 text-base font-bold text-white
+                                        className={`h-[70px] border border-white/10 p-2 text-sm font-bold text-white
                                         ${isToday ? "bg-blue-500/20 border-blue-400" : ""}`}
                                     >
                                         {day && (
@@ -345,7 +347,11 @@ function Calendar() {
                                                             key={event.id}
                                                             className={`flex flex-col px-4 rounded-md text-xs text-blue-300 truncate ${eventColors[event.color]}`}
                                                         >
-                                                            {event.title}
+                                                            <span>
+                                                                {event.title.length > 10
+                                                                    ? event.title.slice(0, 10) + "..."
+                                                                    : event.title}
+                                                            </span>
                                                             <span>
                                                                 {event.time}
                                                             </span>                       
@@ -360,8 +366,8 @@ function Calendar() {
                         </div>
                     </div>
 
-                    <div className="w-250 h-22 border bg-[#121726] border-white/10 rounded-md">
-                        <h1 className="mt-3 px-2">
+                    <div className="w-[895px] h-[125px] border bg-[#121726] border-white/10 rounded-md">
+                        <h1 className="mt-1 px-2">
                             Quick Actions
                         </h1>
                         <div className="grid grid-cols-2 h-8 gap-4 px-4 mt-2">
@@ -390,7 +396,7 @@ function Calendar() {
                 </div>
 
 
-                <div className="w-100 h-150 border flex flex-col items-center bg-[#121726] rounded-md border-white/10 ">
+                <div className="w-[500px] h-[570px] flex flex-col items-center bg-[#121726] rounded-md border border-white/10 ">
                     <div className="flex flex-row text-xs items-center mt-3 justify-center gap-2">
                         <button
                         onClick={prevMiniMonth}
@@ -472,7 +478,7 @@ function Calendar() {
 
             {isEventModalOpen && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
+                    <div className="bg-[#0D1020] px-6 pt-2 rounded-md w-full h-full flex items-center justify-center">
                         <div className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-3">
 
                             <div className="flex flex-row items-center px-2 w-full h-15 gap-4">

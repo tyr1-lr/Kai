@@ -378,8 +378,8 @@ function Goals(){
                     </button>
                 </div>
                 
-                <div className=" h-[440px] overflow-y-auto">
-                    <ul className="flex ml-20 w-320 flex-col text-white gap-2 rounded-md">
+                <div className=" h-[370px] overflow-y-auto">
+                    <ul className="flex ml-10 w-[1190px] flex-col text-white gap-2 rounded-md">
                         {goals
                             .filter((goal) => goal.status === filter)
                             .map((goal) => {
@@ -424,8 +424,8 @@ function Goals(){
 
                             return(
                                 <li key={goal.id} className="w-full h-30 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => openModal(goal)}>
-                                    <div className="w-full h-30 flex flex-row px-5 items-center cursor-pointer ">
-                                        <div className={`${iconColor} h-15 w-15 rounded-full flex flex-row items-center justify-center`}>
+                                    <div className="w-full h-30 flex flex-row px-3 items-center cursor-pointer ">
+                                        <div className={`${iconColor} h-[60px] w-[60px] rounded-full flex items-center justify-center`}>
                                             <CategoryIcon className="h-8 w-8"/>
                                         </div>
 
@@ -436,11 +436,13 @@ function Goals(){
                                                 </h1>
                                             
                                                 <p className="text-sm">
-                                                    {goal.description}
+                                                    {goal.description.length > 50
+                                                        ? goal.description.slice(0, 50) + "..."
+                                                        : goal.description}
                                                 </p>
                                             </div>
                                             
-                                            <div className="w-130 ml-8">
+                                            <div className="w-100 ml-8">
                                                 <div className="flex justify-between text-sm mb-1">
                                                     <span>{progress}%</span>
                                                     <span>

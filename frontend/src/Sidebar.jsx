@@ -93,7 +93,7 @@ function Sidebar (){
                 <div className="mt-10 space-y-2">
                     <ul className="w-full">
                         <li className="w-full">
-                            <NavLink to="#" 
+                            <NavLink to="/profile" 
                             className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"

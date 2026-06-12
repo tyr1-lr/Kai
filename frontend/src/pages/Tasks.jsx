@@ -35,6 +35,30 @@ function Tasks(){
             done: true,
             dueDate: "2026-06-05",
         },
+        {
+            id: 4,
+            title: "Learn React Basics",
+            description: "Learn components, props, and states.",
+            priority: "Low",
+            done: true,
+            dueDate: "2026-06-05",
+        },
+        {
+            id: 5,
+            title: "Learn React Basics",
+            description: "Learn components, props, and states.",
+            priority: "Low",
+            done: true,
+            dueDate: "2026-06-05",
+        },
+        {
+            id: 6,
+            title: "Learn React Basics",
+            description: "Learn components, props, and states.",
+            priority: "Low",
+            done: true,
+            dueDate: "2026-06-05",
+        },
     ];
 
     const filteredTasks = tasks.filter((task) => {
@@ -50,7 +74,7 @@ function Tasks(){
     return(   
         <div>
             <div className="h-22 relative flex items-center px-4 mt-4">
-                <h1 className="font-bold text-white text-3xl ml-20">
+                <h1 className="font-bold text-white text-3xl px-6">
                     Tasks
                 </h1>
 
@@ -100,8 +124,7 @@ function Tasks(){
                     Completed
                 </button>
             </div>
-
-            <ul className="flex ml-20 w-320 flex-col text-white gap-2 rounded-md">
+                <ul className="flex px-6 w-full ml-4 max-w-7xl h-[490px] overflow-y-auto flex-col text-white gap-2 rounded-md">   
                 {filteredTasks.map((task) => {
 
                     let priorityColor;
@@ -116,8 +139,12 @@ function Tasks(){
 
 
                     return(
-                        <li key={task.id} className="w-full h-30 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => openModal(task)}>
-                            <div className="w-full h-30 flex flex-row px-5 items-center cursor-pointer ">
+                        <li
+                        key={task.id}
+                        className="w-full min-h-[100px] flex-shrink-0 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer"
+                        onClick={() => openModal(task)}
+                        >
+                            <div className="flex w-full justify-between items-center px-4 min-w-0 cursor-pointer ">
                                 <input
                                     type="checkbox"
                                     className="h-5 w-5 ml-6 mr-4 accent-red-500 cursor-pointer px-4"
@@ -125,13 +152,13 @@ function Tasks(){
                                 />
                             
                                 <div className="flex w-full justify-between items-center px-4">
-                                    <div className="flex flex-col items-start">
-                                        <h1 className="text-2xl">
+                                    <div className="flex flex-col items-start min-w-0">
+                                        <h1 className="text-2xl truncate max-w-[300px]">
                                         {task.title}
                                     </h1>
                                     
 
-                                    <p className="text-1xl">
+                                    <p className="text-1xl truncate max-w-[300px]">
                                         {task.description}
                                     </p>
                                     <span className="text-1xl">

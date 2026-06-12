@@ -7,6 +7,7 @@ import Notes from './pages/Notes';
 import AIChat from './pages/AIChat';
 import Goals from "./pages/Goals";
 import Calendar from "./pages/Calendar";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -62,6 +63,15 @@ function App() {
                     element={
                         <DashboardLayout>
                             <Calendar />
+                        </DashboardLayout>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <DashboardLayout>
+                            <Profile />
                         </DashboardLayout>
                     }
                 />

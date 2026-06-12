@@ -26,6 +26,22 @@ function Notes(){
                 "Components should be reusable and maintain a single responsibility. Use props for data passing and hooks for state management.",
             created_at: "2026-06-01",
             color: "text-green-600"
+        },
+        {
+            id: 4,
+            title: "Tailwind CSS Notes",
+            content:
+                "Tailwind provides utility-first classes that allow rapid UI development. Consistent spacing, colors, and responsive design can be achieved without writing custom CSS.",
+            created_at: "2026-05-31",
+            color: "text-pink-600"
+        },
+        {
+            id: 5,
+            title: "Project Milestones",
+            content:
+                "Finish frontend pages, connect API endpoints, implement authentication flow, test core features, and prepare deployment configuration.",
+            created_at: "2026-05-30",
+            color: "text-yellow-600"
         }
     ];
 
@@ -65,7 +81,7 @@ function Notes(){
                 </button>
             </div>
 
-            <ul className="flex ml-20 w-320 flex-col text-white gap-2 rounded-md">
+            <ul className="flex px-6 w-full ml-4 max-w-7xl h-[490px] overflow-y-auto flex-col text-white gap-2 rounded-md">   
                 {notes.map((note) => {
                         const colors = [
                             "text-red-500",
@@ -79,7 +95,7 @@ function Notes(){
                         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
                     return(
-                        <li key={note.id} className="w-full h-35 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => openModal(note)}>
+                        <li key={note.id} className="w-full min-h-[100px] flex-shrink-0 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => openModal(note)}>
                             <div className="w-full h-30 flex flex-row px-5 items-center cursor-pointer ">
                             
                                 <div className="flex w-full justify-between gap-4 items-center px-4">

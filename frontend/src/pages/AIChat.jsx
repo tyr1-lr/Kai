@@ -2,7 +2,7 @@ import { useState } from "react";
 import logo from "../assets/logo.png";
 
 function AIChat(){
-    const chats = [
+    const [chats, setChats] = useState([
         {
             id: 1,
             title: "React State Management",
@@ -76,8 +76,42 @@ function AIChat(){
             title: "Checking Syntax",
             updatedAt: "Jun 6",
             messages: []
+        },
+        {
+            id: 6,
+            title: "JavaScript Array Methods",
+            updatedAt: "Jun 8",
+            messages: [
+                {
+                    id: 1,
+                    sender: "user",
+                    content: "What's the difference between map and filter?"
+                },
+                {
+                    id: 2,
+                    sender: "ai",
+                    content: "map transforms every element and returns a new array, while filter returns only elements that match a condition."
+                }
+            ]
+        },
+        {
+            id: 7,
+            title: "Portfolio Project Ideas",
+            updatedAt: "Jun 7",
+            messages: [
+                {
+                    id: 1,
+                    sender: "user",
+                    content: "What projects should I build for my portfolio?"
+                },
+                {
+                    id: 2,
+                    sender: "ai",
+                    content: "A task manager, finance tracker, and AI-powered study assistant are great portfolio projects that showcase full-stack skills."
+                }
+            ]
         }
-    ];
+    ]);
 
 
     const [activeChatId, setActiveChatId] = useState(null);
@@ -107,7 +141,7 @@ function AIChat(){
     };
     
     return(
-        <div className="h-full flex flex-col">
+        <div className="h-screen flex flex-col w-[1311px]">
             <div className="px-4 text-white border-[#2A3145] border-b h-20 w-full">
                 <h1 className="pt-2 text-2xl">
                     AI Chat
@@ -116,9 +150,9 @@ function AIChat(){
                     Chat with Kai AI Assistant
                 </p>
             </div>
-            <div className="flex flex-row h-full">
-                <div className="border border-[#2A3145] w-130 h-full px-4">
-                    <div className="h-14 w-full mt-3 flex flex-col justify-center items-center">
+            <div className="flex flex-row flex-1 min-h-0">
+                <div className="border border-[#2A3145] w-130 px-4 flex flex-col min-h-0">
+                    <div className="h-14 w-full mt-2 flex flex-col justify-center items-center">
                         <button 
                         onClick={() => setActiveChatId(null)}
                         className="h-12 w-80 flex flex-row justify-center items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]">
@@ -135,7 +169,7 @@ function AIChat(){
                         Recent Conversation
                     </h2>
 
-                    <div className=" h-[580px] overflow-y-auto border-t border-[#2A3145]">
+                    <div className="flex-1 min-h-0 overflow-y-auto p-6 border-t border-[#2A3145]">
                         <ul className="gap-2 overflow-y-auto">
                             {chats.map((chat) => (
                                 <li key={chat.id} className="w-full mt-2 h-22 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => setActiveChatId(chat.id)}>
@@ -168,8 +202,8 @@ function AIChat(){
                     </div>
                     
                 </div>
-                <div className="border border-[#2A3145] w-full h-full flex-col flex">
-                    <div className="h-20 w-full flex felx-col px-4">
+                <div className="border border-[#2A3145] w-full flex flex-col min-h-0">
+                    <div className="min-h-[80px] w-full flex px-4">
                         <img src={logo} alt="Logo" className="h-20 w-20"/>
                         <div className="mt-4">
                             <h1 className="text-white text-xl flex flex-row gap-4">
@@ -186,7 +220,7 @@ function AIChat(){
                         </div>
 
                     </div>
-                    <div className="h-25 items-center gap-2 w-full px-4 grid grid-cols-4 ">
+                    <div className="w-full px-4 py-2 grid grid-cols-4 gap-2">
                         <div className="bg-[#121726] rounded-md h-23 flex flex-row items-center">
                             <div className="flex flex-row bg-[#1A1F36] rounded h-13 w-15 text-indigo-700 items-center justify-center ml-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-code-xml-icon lucide-code-xml"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
@@ -240,13 +274,13 @@ function AIChat(){
                             </div>
                         </div>
                     </div>
-                    <div className=" h-[430px] overflow-y-auto p-6 border-t border-[#2A3145]">
+                    <div className="h-[340px] border overflow-y-auto border-t px-4 pt-2 border-[#2A3145]">
                         {!activeChat ? (
                             
                             <div className="h-full flex flex-col items-center justify-center text-center text-white">
 
-                                <div className="text-5xl flex flex-row items-center">
-                                    <img src={logo} alt="Logo" className="h-25 w-25"/>
+                                <div className="text-5xl flex flex-row px-2 items-center">
+                                    <img src={logo} alt="Logo" className="h-24 w-24"/>
                                     <h1>
                                         Kai
                                     </h1>
