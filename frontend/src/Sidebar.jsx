@@ -104,7 +104,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="#" 
+                            <NavLink to="/settings" 
                             className={({ isActive }) => `mt-3 w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"
@@ -120,7 +120,7 @@ function Sidebar (){
                 <div className="absolute bottom-0 pb-8 mt-10 space-y-2 w-47">
                     <ul>
                         <li className="w-full text-red-700">
-                            <NavLink to="#" 
+                            <NavLink to="/logout" 
                             className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"

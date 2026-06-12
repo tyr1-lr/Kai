@@ -539,7 +539,7 @@ function Goals(){
                                         Description
                                     </h2>
                                     <textarea
-                                        className="flex flex-row justify-center ml-5 px-2 pt-2 items-center bg-[#0D1020] w-165 h-40 rounded border-2 border-[#40424C] text-white"
+                                        className="flex flex-row justify-center ml-5 px-2 pt-2 items-center bg-[#0D1020] w-[585px] h-40 rounded border-2 border-[#40424C] text-white"
                                         placeholder="Enter goal description..."
                                         value={formData.description}
                                         onChange={(e) =>

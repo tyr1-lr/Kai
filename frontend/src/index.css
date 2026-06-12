@@ -27,3 +27,32 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
 }
+
+.temperature-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 9999px;
+    background: #2B2146;
+    outline: none;
+}
+
+.temperature-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #A855F7;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+.temperature-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #A855F7;
+    border: none;
+    cursor: pointer;
+}

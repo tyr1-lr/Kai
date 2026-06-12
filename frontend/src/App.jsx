@@ -8,6 +8,7 @@ import AIChat from './pages/AIChat';
 import Goals from "./pages/Goals";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -72,6 +73,15 @@ function App() {
                     element={
                         <DashboardLayout>
                             <Profile />
+                        </DashboardLayout>
+                    }
+                />
+
+                <Route
+                    path="/settings"
+                    element={
+                        <DashboardLayout>
+                            <Settings />
                         </DashboardLayout>
                     }
                 />

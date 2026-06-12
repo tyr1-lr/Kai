@@ -139,7 +139,7 @@ function Notes(){
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     
                     <div className="bg-[#0D1020] rounded-md w-full h-full flex items-center justify-center">
-                        <div className="px-6 h-180 w-300 bg-[#121726] rounded-lg px-6 flex-col flex ">
+                        <div className="px-6 h-[650px] w-300 bg-[#121726] rounded-lg px-6 flex-col flex ">
                             <div className="h-16 flex flex-row mt-4 justify-center items-center">
                                 <button 
                                 onClick={() => setIsOpen(false)}
@@ -163,7 +163,7 @@ function Notes(){
                                 defaultValue={selectedNote?.title || ""}/>
                             </div>
 
-                            <div className="ml-10 flex flex-col gap-4 h-130 rounded w-[1060px] border border-[#333A52]">
+                            <div className="ml-10 flex flex-col gap-4 h-[450px] rounded w-[1060px] border border-[#333A52]">
                                 <div className="text-white mt-3 flex flex-row gap-6 px-4 h-10 items-center">
                                     <button className="cursor-pointer hover:text-[#1f2a3d] flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bold-icon lucide-bold block leading-none"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>
@@ -179,7 +179,7 @@ function Notes(){
                                     </button>
                                 </div>
                                 <textarea
-                                    className="w-full h-150 rounded border border-[#333A52] text-white"
+                                    className="w-full h-[450px] rounded border border-[#333A52] text-white"
                                     placeholder="Enter notes..."
                                     defaultValue={selectedNote?.content || ""}
                                 />
