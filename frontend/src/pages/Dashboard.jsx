@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import profile from "../assets/profile.png";
 
 
@@ -235,7 +236,7 @@ function Dashboard(){
                                 Recent Tasks
                             </h1>
 
-                            <a className="ml-auto mt-1 text-lg text-indigo-500" href="#">View all</a>
+                            <NavLink to="/dashboard/tasks" className="ml-auto mt-1 text-lg text-indigo-500">View all</NavLink>
                         </div>
 
                         <ul>
@@ -276,14 +277,17 @@ function Dashboard(){
                             })}
                         </ul>
 
-                        <a href="#" className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">
+                        <NavLink 
+                        to="/dashboard/tasks" 
+                        state={{ openNewTaskModal: true }}
+                        className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M5 12h14"/>
                                 <path d="M12 5v14"/>
                             </svg>
 
                             <span>New Task</span>
-                        </a>
+                        </NavLink>
                     
                     </div>
 
@@ -293,7 +297,7 @@ function Dashboard(){
                                 Recent Notes
                             </h1>
 
-                            <a className="ml-auto mt-1 text-lg text-indigo-500" href="#">View all</a>
+                            <NavLink to="/dashboard/notes" className="ml-auto mt-1 text-lg text-indigo-500" href="#">View all</NavLink>
                         </div>
 
                         <ul>
@@ -315,14 +319,17 @@ function Dashboard(){
                             ))}
                         </ul>
 
-                        <a href="#" className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">
+                        <NavLink 
+                        to="/dashboard/notes" 
+                        state={{ openNewNoteModal: true }}
+                        className="flex h-16 items-center text-indigo-500 gap-2 w-full cursor-pointer p-4 hover:bg-[#1f2a3d]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M5 12h14"/>
                                 <path d="M12 5v14"/>
                             </svg>
 
                             <span>New Notes</span>
-                        </a>
+                        </NavLink>
                     
                     </div>
 

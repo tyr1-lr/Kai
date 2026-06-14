@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from 'react'
-import DashboardLayout from './DashboardLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Notes from './pages/Notes';
@@ -9,13 +9,76 @@ import Goals from "./pages/Goals";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Navbar from "./components/Navbar";
+import LandingLayout from "./layouts/LandingLayout";
+import Landing from "./pages/Landing";
+import Features from "./pages/Features";
+import About from "./pages/About";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgetPassword from "./pages/ForgetPassword";
 
 function App() {
-  return (
+    return (
         <BrowserRouter>
             <Routes>
                 <Route
                     path="/"
+                    element={
+                        <LandingLayout>
+                            <Landing />
+                        </LandingLayout>
+                    }
+                />
+
+                <Route
+                    path="/features"
+                    element={
+                        <LandingLayout>
+                            <Features />
+                        </LandingLayout>
+                    }
+                />
+
+                <Route
+                    path="/about"
+                    element={
+                        <LandingLayout>
+                            <About />
+                        </LandingLayout>
+                    }
+                />
+
+                <Route
+                    path="/login"
+                    element={
+                        <LandingLayout>
+                            <Login />
+                        </LandingLayout>
+                    }
+                />
+
+                <Route
+                    path="/register"
+                    element={
+                        <LandingLayout>
+                            <Register />
+                        </LandingLayout>
+                    }
+                />
+
+                <Route
+                    path="/forgot-password"
+                    element={
+                        <LandingLayout>
+                            <ForgetPassword />
+                        </LandingLayout>
+                    }
+                />
+                
+
+                <Route
+                    path="/dashboard"
                     element={
                         <DashboardLayout>
                             <Dashboard />
@@ -24,7 +87,7 @@ function App() {
                 />
 
                 <Route
-                    path="/tasks"
+                    path="/dashboard/tasks"
                     element={
                         <DashboardLayout>
                             <Tasks />
@@ -33,7 +96,7 @@ function App() {
                 />
 
                 <Route
-                    path="/notes"
+                    path="/dashboard/notes"
                     element={
                         <DashboardLayout>
                             <Notes />
@@ -42,7 +105,7 @@ function App() {
                 />
 
                 <Route
-                    path="/ai-chat"
+                    path="/dashboard/ai-chat"
                     element={
                         <DashboardLayout>
                             <AIChat />
@@ -51,7 +114,7 @@ function App() {
                 />
 
                 <Route
-                    path="/goals"
+                    path="/dashboard/goals"
                     element={
                         <DashboardLayout>
                             <Goals />
@@ -60,7 +123,7 @@ function App() {
                 />
 
                 <Route
-                    path="/calendar"
+                    path="/dashboard/calendar"
                     element={
                         <DashboardLayout>
                             <Calendar />
@@ -69,7 +132,7 @@ function App() {
                 />
 
                 <Route
-                    path="/profile"
+                    path="/dashboard/profile"
                     element={
                         <DashboardLayout>
                             <Profile />
@@ -78,7 +141,7 @@ function App() {
                 />
 
                 <Route
-                    path="/settings"
+                    path="/dashboard/settings"
                     element={
                         <DashboardLayout>
                             <Settings />
@@ -88,6 +151,5 @@ function App() {
             </Routes>
         </BrowserRouter>
     );
-};
-
-export default App
+}
+export default App;

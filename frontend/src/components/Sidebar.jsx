@@ -1,4 +1,4 @@
-import logo from "./assets/logo.png";
+import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
@@ -7,18 +7,18 @@ function Sidebar (){
 
     return(
         <div className="h-screen border w-56 border-[#2A3145] flex flex-col p-2 bg-[#0D0A1F]">
-            <div className="flex flex-row">
+            <NavLink to="/dashboard" className="flex flex-row">
                 <img src={logo} alt="Logo" className="w-16 h-16" />
                 <h1 className="m-3 text-2xl text-white">
                 Kai
                 </h1>
-            </div>
+            </NavLink>
             
             <div className="py-5 overflow-y-auto text-white px-2 w-full">
                 <ul className="space-y-3 font-medium w-full flex flex-col">
                         <li>
                             <NavLink
-                                to="/"
+                                to="/dashboard"
                                 end
                                 className={({ isActive }) => ` w-full flex items-center px-4 py-3 text-body rounded-xl hover:text-fg-brand group  ${
                                     isActive
@@ -32,7 +32,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/tasks" 
+                            <NavLink to="/dashboard/tasks"
                                 className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                     isActive
                                         ? "bg-[#1D1634] text-white"
@@ -44,7 +44,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/notes"
+                            <NavLink to="/dashboard/notes"
                                 className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                     isActive
                                         ? "bg-[#1D1634] text-white"
@@ -56,7 +56,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/ai-chat" 
+                            <NavLink to="/dashboard/ai-chat" 
                             className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"
@@ -67,7 +67,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/goals" 
+                            <NavLink to="/dashboard/goals" 
                             className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"
@@ -78,7 +78,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/calendar" 
+                            <NavLink to="/dashboard/calendar" 
                             className={({ isActive }) => `w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"
@@ -93,7 +93,7 @@ function Sidebar (){
                 <div className="mt-10 space-y-2">
                     <ul className="w-full">
                         <li className="w-full">
-                            <NavLink to="/profile" 
+                            <NavLink to="/dashboard/profile" 
                             className={({ isActive }) => ` w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"
@@ -104,7 +104,7 @@ function Sidebar (){
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/settings" 
+                            <NavLink to="/dashboard/settings" 
                             className={({ isActive }) => `mt-3 w-full flex items-center px-4 py-2 text-body rounded-xl hover:text-fg-brand group ${
                                 isActive
                                         ? "bg-[#1D1634] text-white"

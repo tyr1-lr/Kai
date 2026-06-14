@@ -1,5 +1,5 @@
 
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar.jsx"
 
 function DashboardLayout ({ children }){
     return(

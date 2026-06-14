@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function Tasks(){
     const [filter, setFilter] = useState("all")
@@ -70,6 +70,13 @@ function Tasks(){
             return task.done;
         }
     });
+    const location = useLocation();
+
+    useEffect(() => {
+            if (location.state?.openNewTaskModal && !isOpen) {
+                openModal(null);
+            }
+        }, [location.state]);
    
     return(   
         <div>

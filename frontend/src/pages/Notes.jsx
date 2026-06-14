@@ -1,5 +1,5 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function Notes(){
     const notes = [
@@ -47,12 +47,18 @@ function Notes(){
 
     const [isOpen, setIsOpen] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
+    const location = useLocation();
 
     const openModal = (note = null) => {
     setSelectedNote(note);
     setIsOpen(true);
     };
 
+    useEffect(() => {
+        if (location.state?.openNewNoteModal && !isOpen) {
+            openModal(null);
+        }
+    }, [location.state]);
 
     return(
         <div>
@@ -190,7 +196,10 @@ function Notes(){
 
                     </div>
                 </div>
+
+                
             )}
+            
 
             
         </div>
