@@ -1,8 +1,33 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import bgAuth from "../assets/bgauth.png";
 import logo from "../assets/logo.png";
+import { useState } from "react";
+import api from "../api"
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
-function Login() {
+function Login({ route }) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try{
+            const res = await api.post(route, {email, password});
+            localStorage.setItem(ACCESS_TOKEN, res.data.access);
+            localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+            
+            navigate("/dashboard");
+        } catch (error) {
+            alert(error.response?.data?.detail || error.message);
+        } finally {
+            setLoading(false)
+        }
+    };
+
     return (
         <div className="flex flex-row bg-[#050314] h-full gap-4 items-center justify-center">
             <div 
@@ -22,13 +47,16 @@ function Login() {
                         Login to continue to your workspace.
                     </p>
                 </div>
-                <div>
+                <form onSubmit={handleSubmit} >
                     <div className=" w-[500px]">
                         <h2 className="text-white mt-4">
                             Email
                         </h2>
                         <input
+                            type="text"
                             className="w-full h-10 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="your@email.com"/>
                     </div>
                     <div className=" w-[500px]">
@@ -44,7 +72,10 @@ function Login() {
                         </div>
                         
                         <input
+                            type="password"
+                            value={password}
                             className="w-full h-10 mb-1 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
+                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"/>
                     </div>
                     <div className="flex flex-row gap-2">
@@ -53,8 +84,10 @@ function Login() {
                     </div>
                     <div className="mt-3 flex flex-row items-center justify-center">
                         <button
+                        type="submit"
+                        disabled={loading}
                         className="h-12 w-full justify-center flex items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]">
-                            Login
+                            {loading ? "Loggin in..." : "Login"}
                         </button>
                     </div>
                     <div className="flex flex-row gap-2 flex justify-center mt-1">
@@ -63,7 +96,7 @@ function Login() {
                         </span>
                         <NavLink to="/register" className="text-purple-700 hover:text-purple-900">Register</NavLink>
                     </div>
-                </div>
+                </form>
             </div>
              
         </div>

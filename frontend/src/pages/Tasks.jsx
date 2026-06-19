@@ -1,73 +1,91 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useAsyncError, useLocation } from "react-router-dom";
+import api from "../api";
 
 function Tasks(){
-    const [filter, setFilter] = useState("all")
+    const [tasks, setTasks] = useState([]);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [priority, setPriority] = useState("MEDIUM");
+    const [dueDate, setDueDate] = useState("");
+    const [isCompleted, setIsCompleted] = useState(false);
+
+    const [filter, setFilter] = useState("all");
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
 
+    useEffect (() => {
+        getTasks();
+    }, []);
+
+    const getTasks = () => {
+        api.get("/api/tasks/").then((res) => res.data).then((data) => {
+            setTasks(data);
+            console.log(data);
+        })
+        .catch((err) => alert(err));
+    };
+
+    const deleteTask = (id) => {
+        api.delete(`/api/tasks/delete/${id}/`).then((res) => {
+            if (res.status === 204) alert("Task deleted!");
+            else alert("Failed to delete task.");
+            getTasks();
+        })
+        .catch((error) => alert(error));
+    };
+
+    const createTask = (e) => {
+        e.preventDefault();
+        api.post("/api/tasks/", {
+            title, 
+            description, 
+            priority, 
+            due_date: dueDate, 
+            is_completed: isCompleted,
+        }).then((res) => {
+            if (res.status === 201) alert("Task is created!");
+            else alert("Failed to create task.");
+            getTasks();
+        })
+        .catch((err) => alert(err));
+    };
+
     const openModal = (task = null) => {
     setSelectedTask(task);
+
+    if (task){
+        setTitle(task.title);
+        setDescription(task.description);
+        setPriority(task.priority);
+        setDueDate(task.due_date || "");
+        setIsCompleted(task.is_completed);
+    } else {
+        setTitle("");
+        setDescription("");
+        setPriority("MEDIUM");
+        setDueDate("");
+        setIsCompleted(false);
+    }
+
     setIsOpen(true);
     };
-    const tasks = [
-        {
-            id: 1,
-            title: "Study Django Models",
-            description: "Learn about Django models, fields, and relationship.",
-            priority: "High",
-            done: false,
-            dueDate: "2026-06-10",
-        },
-        {
-            id: 2,
-            title: "Build Kai Backend",
-            description: "Setup Django project and create API endpoints.",
-            priority: "Medium",
-            done: false,
-            dueDate: "2026-06-15",
-        },
-        {
-            id: 3,
-            title: "Learn React Basics",
-            description: "Learn components, props, and states.",
-            priority: "Low",
-            done: true,
-            dueDate: "2026-06-05",
-        },
-        {
-            id: 4,
-            title: "Learn React Basics",
-            description: "Learn components, props, and states.",
-            priority: "Low",
-            done: true,
-            dueDate: "2026-06-05",
-        },
-        {
-            id: 5,
-            title: "Learn React Basics",
-            description: "Learn components, props, and states.",
-            priority: "Low",
-            done: true,
-            dueDate: "2026-06-05",
-        },
-        {
-            id: 6,
-            title: "Learn React Basics",
-            description: "Learn components, props, and states.",
-            priority: "Low",
-            done: true,
-            dueDate: "2026-06-05",
-        },
-    ];
+
+    const toggleTask = async (task) => {
+        await api.patch(`/api/tasks/${task.id}/`, {
+            is_completed: !task.is_completed,
+        });
+
+        getTasks();
+    };
 
     const filteredTasks = tasks.filter((task) => {
         if (filter === "all"){
             return true
         } else if (filter === "pending"){
-            return !task.done;
+            return !task.is_completed;
         } else if (filter === "completed"){
-            return task.done;
+            return task.is_completed;
         }
     });
     const location = useLocation();
@@ -136,9 +154,9 @@ function Tasks(){
 
                     let priorityColor;
 
-                    if (task.priority === "High") {
+                    if (task.priority === "HIGH") {
                         priorityColor = "bg-red-500/20 text-red-700";
-                    } else if (task.priority === "Medium") {
+                    } else if (task.priority === "MEDIUM") {
                         priorityColor = "bg-orange-500/20 text-orange-700";
                     } else {
                         priorityColor = "bg-green-500/20 text-green-700";
@@ -155,6 +173,9 @@ function Tasks(){
                                 <input
                                     type="checkbox"
                                     className="h-5 w-5 ml-6 mr-4 accent-red-500 cursor-pointer px-4"
+                                    type="checkbox"
+                                    checked={task.is_completed}
+                                    onChange={() => toggleTask(task)}
                                     onClick={(e) => e.stopPropagation()}
                                 />
                             
@@ -169,12 +190,16 @@ function Tasks(){
                                         {task.description}
                                     </p>
                                     <span className="text-1xl">
-                                        Due: {task.dueDate}
+                                        Due: {task.due_date}
                                     </span>
                                     </div>
                                     <div className="flex flex-col items-end justify-between h-full ml-auto gap-4">
                                         <button 
-                                            onClick={(e) => e.stopPropagation()} 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteTask(task.id);
+                                            }}
+                                            
                                             className="cursor-pointer p-1 rounded-md hover:bg-red-500/10 active:scale-95 transition"
                                             >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
@@ -199,13 +224,15 @@ function Tasks(){
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     
                     <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
-                        <div className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-10">
+                        <form onSubmit={createTask} className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-10">
                             <div className="flex flex-row ">
-                                <h1 className="text-white text-2xl font-bold mb-4 px-4 items-center flex">
+                                <h1 className="text-white text-2xl font-bold  px-4 items-center flex">
                                 {selectedTask ? "Edit Task" : "Create New Task"}
                                 </h1>
                                 <button className="ml-auto cursor-pointer"
-                                onClick={() => setIsOpen(false)}>
+                                onClick={() => setIsOpen(false)}
+                                type="button"
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hover:text-red-600 text-white mr-4 ml-auto lucide lucide-x-icon lucide-x">
                                         <path d="M18 6 6 18"/>
                                         <path d="m6 6 12 12"/>
@@ -214,14 +241,15 @@ function Tasks(){
                                 
                             </div>
                             
-                            <div className="mt-6 flex flex-col gap-1">
+                            <div className="mt-2 flex flex-col gap-1">
                                 <h2 className="text-white text-xl mt-4">
                                     Title
                                 </h2>
                                 <input
                                     className="w-full mb-3 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
+                                    value={title}
                                     placeholder="Enter task title"
-                                    defaultValue={selectedTask?.title || ""}
+                                    onChange={(e) => setTitle(e.target.value)}
                                 />
 
                                 <h2 className="text-white text-xl mt-4">
@@ -230,7 +258,8 @@ function Tasks(){
                                 <textarea
                                     className="w-full h-32 mb-3 p-2 rounded border-2 border-[#40424C] text-white"
                                     placeholder="Enter task description..."
-                                    defaultValue={selectedTask?.description || ""}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
                                 />
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -238,10 +267,13 @@ function Tasks(){
                                         <h1 className="text-white text-xl">
                                             Priority
                                         </h1>
-                                        <select name="priority" className="px-4 mt-4 w-full h-10 bg-[#0D1020] text-white rounded border-2 border-[#40424C]" id="">
-                                            <option value="High">High</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Low">Low</option>
+                                        <select 
+                                        value={priority}
+                                        onChange={(e) => setPriority(e.target.value)}
+                                        name="priority" className="px-4 mt-4 w-full h-10 bg-[#0D1020] text-white rounded border-2 border-[#40424C]" id="">
+                                            <option value="HIGH">High</option>
+                                            <option value="MEDIUM">Medium</option>
+                                            <option value="LOW">Low</option>
                                         </select>
 
                                     </div>
@@ -249,26 +281,41 @@ function Tasks(){
                                         <h1 className="text-white text-xl">
                                             Due Date
                                         </h1>
-                                        <input type="date" className="mt-4 w-full h-10 bg-[#0D1020] text-white rounded border-2 border-[#40424C] px-4"/>
+                                        <input 
+                                        type="date" 
+                                        value={dueDate}
+                                        onChange={(e) => setDueDate(e.target.value)}
+                                        className="mt-4 w-full h-10 bg-[#0D1020] text-white rounded border-2 border-[#40424C] px-4"/>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="flex flex-row gap-2 text-white text-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={isCompleted}
+                                        onChange={(e) => setIsCompleted(e.target.checked)}
+                                        className="h-5 w-5 ml-6 mr-4 accent-red-500 cursor-pointer px-4"
+                                    />
+                                    <h1>Mark as completed</h1>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-4">
                                     <button
+                                        type="button"
                                         className="w-full h-16 text-white border cursor-pointer border-[#40424C] rounded hover:bg-[#1f2a3d] "
                                         onClick={() => setIsOpen(false)}
                                     >
                                         Cancel
                                     </button>
 
-                                    <button className="w-full bg-indigo-700 cursor-pointer text-white rounded hover:bg-indigo-600">
+                                    <button type="submit" value="Submit" className="w-full bg-indigo-700 cursor-pointer text-white rounded hover:bg-indigo-600">
                                         {selectedTask ? "Save Changes" : "Create Task"}
                                     </button>
                                 </div>
                                 
                             </div>
                             
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}

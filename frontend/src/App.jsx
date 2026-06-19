@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from 'react'
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -17,11 +17,37 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgetPassword from "./pages/ForgetPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound";
+
+function Logout() {
+    localStorage.clear()
+    return <Navigate to="/login"/>
+}
+
+function RegisterAndLogout() {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    return (
+        <LandingLayout>
+            <Register route="/api/register/"/>
+        </LandingLayout>
+    );
+}
+
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route
+                    path="*"
+                    element={
+                        <NotFound />
+                    }
+                />
+
                 <Route
                     path="/"
                     element={
@@ -53,18 +79,19 @@ function App() {
                     path="/login"
                     element={
                         <LandingLayout>
-                            <Login />
+                            <Login route="/api/token/" />
                         </LandingLayout>
                     }
                 />
 
                 <Route
+                    path="/logout"
+                    element={<Logout />}
+                />
+
+                <Route
                     path="/register"
-                    element={
-                        <LandingLayout>
-                            <Register />
-                        </LandingLayout>
-                    }
+                    element={<RegisterAndLogout />}
                 />
 
                 <Route
@@ -80,72 +107,88 @@ function App() {
                 <Route
                     path="/dashboard"
                     element={
-                        <DashboardLayout>
-                            <Dashboard />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Dashboard />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/tasks"
                     element={
-                        <DashboardLayout>
-                            <Tasks />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Tasks />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/notes"
                     element={
-                        <DashboardLayout>
-                            <Notes />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Notes />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/ai-chat"
                     element={
-                        <DashboardLayout>
-                            <AIChat />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <AIChat />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/goals"
                     element={
-                        <DashboardLayout>
-                            <Goals />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Goals />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/calendar"
                     element={
-                        <DashboardLayout>
-                            <Calendar />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Calendar />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/profile"
                     element={
-                        <DashboardLayout>
-                            <Profile />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Profile />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
 
                 <Route
                     path="/dashboard/settings"
                     element={
-                        <DashboardLayout>
-                            <Settings />
-                        </DashboardLayout>
+                        <ProtectedRoute>
+                            <DashboardLayout>
+                                <Settings />
+                            </DashboardLayout>
+                        </ProtectedRoute>
                     }
                 />
             </Routes>
