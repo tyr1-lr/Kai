@@ -46,9 +46,30 @@ function Tasks(){
         }).then((res) => {
             if (res.status === 201) alert("Task is created!");
             else alert("Failed to create task.");
+            setIsOpen(false);
             getTasks();
         })
         .catch((err) => alert(err));
+    };
+
+    const editTask = async (e) => {
+    e.preventDefault();
+
+    try {
+            await api.put(`/api/tasks/${selectedTask.id}/`, {
+                title,
+                description,
+                priority,
+                due_date: dueDate,
+                is_completed: isCompleted,
+            });
+
+            alert("Task updated!");
+            setIsOpen(false);
+            getTasks();
+        } catch (err) {
+            alert(err);
+        }
     };
 
     const openModal = (task = null) => {
@@ -224,7 +245,7 @@ function Tasks(){
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     
                     <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
-                        <form onSubmit={createTask} className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-10">
+                        <form onSubmit={selectedTask ? editTask : createTask} className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-10">
                             <div className="flex flex-row ">
                                 <h1 className="text-white text-2xl font-bold  px-4 items-center flex">
                                 {selectedTask ? "Edit Task" : "Create New Task"}

@@ -1,35 +1,35 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .serializer import TaskSerializer
+from .serializer import NoteSerializer
 from rest_framework.permissions import IsAuthenticated
-from .models import Task
+from .models import Note
 
 
-class TaskListCreate (generics.ListCreateAPIView):
-    serializer_class = TaskSerializer
+class NoteListCreate (generics.ListCreateAPIView):
+    serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(author=user)
+        return Note.objects.filter(author=user)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
-class TaskEdit (generics.RetrieveUpdateAPIView):
-    serializer_class = TaskSerializer
+class NoteEdit (generics.RetrieveUpdateAPIView):
+    serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(author=user)
+        return Note.objects.filter(author=user)
 
 
-class TaskDelete (generics.DestroyAPIView):
-    serializer_class = TaskSerializer
+class NoteDelete (generics.DestroyAPIView):
+    serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(author=user)
+        return Note.objects.filter(author=user)

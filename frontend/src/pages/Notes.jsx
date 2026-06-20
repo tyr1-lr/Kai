@@ -1,53 +1,68 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useAsyncError, useLocation } from "react-router-dom";
+import api from "../api";
+
 
 function Notes(){
-    const notes = [
-        {
-            id: 1,
-            title: "Django Models Overview",
-            content:
-                "Django models define the structure of database tables. Each model is a Python class that inherits from models.Model and maps to a database table.",
-            created_at: "2026-06-03",
-            color: "text-purple-600"
-        },
-        {
-            id: 2,
-            title: "API Design Plan",
-            content:
-                "Create RESTful endpoints for authentication, tasks, notes, and goals. Use JWT for security and implement pagination for large datasets.",
-            created_at: "2026-06-02",
-            color: "text-blue-600"
-        },
-        {
-            id: 3,
-            title: "React Components",
-            content:
-                "Components should be reusable and maintain a single responsibility. Use props for data passing and hooks for state management.",
-            created_at: "2026-06-01",
-            color: "text-green-600"
-        },
-        {
-            id: 4,
-            title: "Tailwind CSS Notes",
-            content:
-                "Tailwind provides utility-first classes that allow rapid UI development. Consistent spacing, colors, and responsive design can be achieved without writing custom CSS.",
-            created_at: "2026-05-31",
-            color: "text-pink-600"
-        },
-        {
-            id: 5,
-            title: "Project Milestones",
-            content:
-                "Finish frontend pages, connect API endpoints, implement authentication flow, test core features, and prepare deployment configuration.",
-            created_at: "2026-05-30",
-            color: "text-yellow-600"
-        }
-    ];
+    const [notes , setNotes] = useState([]);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
 
     const [isOpen, setIsOpen] = useState(false);
     const [selectedNote, setSelectedNote] = useState(null);
     const location = useLocation();
+
+    useEffect (() => {
+        getNotes();
+    }, []);
+
+    const getNotes = () => {
+        api.get("/api/notes/").then((res) => res.data).then((data) => {
+            setNotes(data);
+            console.log(data);
+        })
+        .catch((err) => alert(error));
+    };
+
+    const deleteNote = (id) => {
+        api.delete(`/api/notes/delete/${id}/`).then((res) => {
+            if (res.status === 204) alert ("Note deleted!");
+            else alert("Failed to delete note.");
+            getNotes();
+        })
+        .catch((err) => alert(err));
+    };
+
+    const createNote = (e) => {
+        e.preventDefault();
+        api.post("/api/notes/", {
+            title,
+            content,
+        }).then((res) => {
+            if (res.status === 201) alert("Note is created!");
+            else alert("Failed to create note.");
+            setIsOpen(false);
+            getNotes();
+        })
+        .catch((err) => alert(err));
+    };
+
+    const editNote = async (e) => {
+        e.preventDefault();
+
+        try {
+            await api.put(`/api/notes/${selectedNote.id}/`, {
+                title,
+                content,
+            });
+
+            alert("Note updated!");
+            setIsOpen(false);
+            getNotes();
+        } catch (err) {
+            alert(err);
+        }
+    };
 
     const openModal = (note = null) => {
     setSelectedNote(note);
@@ -123,7 +138,10 @@ function Notes(){
                                     </div>
                                     <div className="flex flex-col items-end justify-between h-full ml-auto gap-4">
                                         <button 
-                                            onClick={(e) => e.stopPropagation()} 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteNote(note.id);
+                                            }}
                                             className="cursor-pointer p-1 rounded-md hover:bg-red-500/10 active:scale-95 transition"
                                             >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
@@ -145,7 +163,7 @@ function Notes(){
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     
                     <div className="bg-[#0D1020] rounded-md w-full h-full flex items-center justify-center">
-                        <div className="px-6 h-[650px] w-300 bg-[#121726] rounded-lg px-6 flex-col flex ">
+                        <form onSubmit={selectedNote ? editNote : createNote} className="px-6 h-[650px] w-300 bg-[#121726] rounded-lg px-6 flex-col flex ">
                             <div className="h-16 flex flex-row mt-4 justify-center items-center">
                                 <button 
                                 onClick={() => setIsOpen(false)}
@@ -155,7 +173,8 @@ function Notes(){
                                 </button>
 
                                 <button 
-                                onClick={() => setIsOpen(false)}
+                                value="Submit"
+                                type="submit"
                                 className="h-10 w-19 mr-10 flex ml-auto items-center rounded-md text-xl text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]">
                                     <span>Save</span>
                                 </button>
@@ -165,8 +184,13 @@ function Notes(){
                                 <h2 className="text-xl text-white ">
                                     Title
                                 </h2>
-                                <input type="text" className="h-10 w-full rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
-                                defaultValue={selectedNote?.title || ""}/>
+                                <input 
+                                type="text" 
+                                value={title}
+                                className="h-10 w-full rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Enter note title"
+                                />
                             </div>
 
                             <div className="ml-10 flex flex-col gap-4 h-[450px] rounded w-[1060px] border border-[#333A52]">
@@ -187,11 +211,12 @@ function Notes(){
                                 <textarea
                                     className="w-full h-[450px] rounded border border-[#333A52] text-white"
                                     placeholder="Enter notes..."
-                                    defaultValue={selectedNote?.content || ""}
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
                                 />
                                 
                             </div>
-                        </div>
+                        </form>
 
 
                     </div>
