@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "task",
     "note",
+    "aichat",
 ]
 
 MIDDLEWARE = [
@@ -121,3 +122,5 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+GEMINI_API_KEY = env('GEMINI_API_KEY')
