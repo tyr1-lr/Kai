@@ -7,6 +7,9 @@ from .models import Chat, ChatMessage
 from .services import generate_response
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from .prompts.prompt_builder import build_prompt
+from .prompts.context import get_relevant_tasks
+from .actions.parser import parse_ai_response
 
 
 class ChatListCreate (generics.ListCreateAPIView):
@@ -75,17 +78,34 @@ class SendMessageView(APIView):
             content=user_message
         )
 
+        prompt = build_prompt(
+            request.user,
+            chat,
+            user_message
+        )
+
+        # print(prompt)
+
         try:
-            messages = chat.messages.all()
+            reply = generate_response(prompt)
 
-            conversation = ""
+            response = """
+            {
+                "reply": "Done! I've created your task.",
+                "intent": "create_task",
+                "data": {
+                    "title": "Study Django",
+                    "priority": "HIGH"
+                }
+            }
+            """
 
-            for message in messages:
-                conversation += (
-                    f"{message.role}: {message.content}\n"
-                )
+            parsed = parse_ai_response(response)
 
-            reply = generate_response(conversation)
+            print(parsed)
+            print(parsed["reply"])
+            print(parsed["intent"])
+            print(parsed["data"])
 
             ChatMessage.objects.create(
                 chat=chat,

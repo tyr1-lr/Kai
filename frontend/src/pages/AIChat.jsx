@@ -142,13 +142,21 @@ function AIChat(){
     
     return(
         <div className="h-screen flex flex-col w-[1311px]">
-            <div className="px-4 text-white border-[#2A3145] border-b h-20 w-full">
-                <h1 className="pt-2 text-2xl">
-                    AI Chat
-                </h1>
-                <p>
-                    Chat with Kai AI Assistant
-                </p>
+            <div className="min-h-[80px] w-full flex px-4">
+                <img src={logo} alt="Logo" className="h-20 w-20"/>
+                <div className="mt-4">
+                    <h1 className="text-white text-xl flex flex-row gap-4">
+                        Kai AI
+                        <div className="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full w-fit">
+                            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                            <span className="text-sm">Online</span>
+                        </div>
+                    </h1>
+                    <p className="text-white flex flex-row text-xs mt-2 gap-2">
+                        Powered by Gemini 2.5 Flash 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 lucide lucide-sparkles-icon lucide-sparkles"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
+                    </p>
+                </div>
             </div>
             <div className="flex flex-row flex-1 min-h-0">
                 <div className="border border-[#2A3145] w-130 px-4 flex flex-col min-h-0">
@@ -169,7 +177,7 @@ function AIChat(){
                         Recent Conversation
                     </h2>
 
-                    <div className="flex-1 min-h-0 overflow-y-auto p-6 border-t border-[#2A3145]">
+                    <div className="flex-1 min-h-0 overflow-y-auto p-4 border-t border-[#2A3145]">
                         <ul className="gap-2 overflow-y-auto">
                             {chats.map((chat) => (
                                 <li key={chat.id} className="w-full mt-2 h-22 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer" onClick={() => setActiveChatId(chat.id)}>
@@ -203,78 +211,7 @@ function AIChat(){
                     
                 </div>
                 <div className="border border-[#2A3145] w-full flex flex-col min-h-0">
-                    <div className="min-h-[80px] w-full flex px-4">
-                        <img src={logo} alt="Logo" className="h-20 w-20"/>
-                        <div className="mt-4">
-                            <h1 className="text-white text-xl flex flex-row gap-4">
-                                Kai AI
-                                <div className="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full w-fit">
-                                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                                    <span className="text-sm">Online</span>
-                                </div>
-                            </h1>
-                            <p className="text-white flex flex-row text-xs mt-2 gap-2">
-                                Powered by Gemini 2.5 Flash 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 lucide lucide-sparkles-icon lucide-sparkles"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
-                            </p>
-                        </div>
-
-                    </div>
-                    <div className="w-full px-4 py-2 grid grid-cols-4 gap-2">
-                        <div className="bg-[#121726] rounded-md h-23 flex flex-row items-center">
-                            <div className="flex flex-row bg-[#1A1F36] rounded h-13 w-15 text-indigo-700 items-center justify-center ml-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-code-xml-icon lucide-code-xml"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
-                            </div>
-                            <div className="text-white ml-2">
-                                <h1 className="text-base">
-                                    Explain Code
-                                </h1>
-                                <p className="text-xs"> 
-                                    Get help understanding code in any language
-                                </p>
-                            </div>
-                        </div>
-                        <div className="bg-[#121726] rounded-md h-23 flex flex-row items-center">
-                            <div className="flex flex-row bg-[#1A1F36] rounded h-13 w-15 text-indigo-700 items-center justify-center ml-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
-                            </div>
-                            <div className="text-white ml-2">
-                                <h1 className="text-base">
-                                    Summarize
-                                </h1>
-                                <p className="text-xs"> 
-                                    Summarize notes, articles or long texts
-                                </p>
-                            </div>
-                        </div>
-                        <div className="bg-[#121726] rounded-md h-23 flex flex-row items-center">
-                            <div className="flex flex-row bg-[#1A1F36] rounded h-13 w-15 text-indigo-700 items-center justify-center ml-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-icon lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
-                            </div>
-                            <div className="text-white ml-2">
-                                <h1 className="text-base">
-                                    Generate Notes
-                                </h1>
-                                <p className="text-xs"> 
-                                    Create notes on any topic instantly
-                                </p>
-                            </div>
-                        </div>
-                        <div className="bg-[#121726] rounded-md h-23 flex flex-row items-center">
-                            <div className="flex flex-row bg-[#1A1F36] rounded h-13 w-15 text-indigo-700 items-center justify-center ml-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-graduation-cap-icon lucide-graduation-cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
-                            </div>
-                            <div className="text-white ml-2">
-                                <h1 className="text-base">
-                                    Study Assistant
-                                </h1>
-                                <p className="text-xs"> 
-                                    Get help with concepts, explanation & more
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="h-[340px] border overflow-y-auto border-t px-4 pt-2 border-[#2A3145]">
+                    <div className="h-[520px] border overflow-y-auto border-t px-4 pt-4 border-[#2A3145]">
                         {!activeChat ? (
                             
                             <div className="h-full flex flex-col items-center justify-center text-center text-white">
