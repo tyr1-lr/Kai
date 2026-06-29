@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from .prompts.prompt_builder import build_prompt
 from .prompts.context import get_relevant_tasks
 from .actions.parser import parse_ai_response
+from .actions.validator import validate_action
+from .actions.executor import execute_action
 
 
 class ChatListCreate (generics.ListCreateAPIView):
@@ -78,43 +80,44 @@ class SendMessageView(APIView):
             content=user_message
         )
 
-        prompt = build_prompt(
-            request.user,
-            chat,
-            user_message
-        )
-
-        # print(prompt)
-
         try:
-            reply = generate_response(prompt)
+            prompt = build_prompt(
+                request.user,
+                chat,
+                user_message
+            )
 
-            response = """
-            {
-                "reply": "Done! I've created your task.",
-                "intent": "create_task",
-                "data": {
-                    "title": "Study Django",
-                    "priority": "HIGH"
-                }
-            }
-            """
+            response = generate_response(prompt)
 
             parsed = parse_ai_response(response)
 
-            print(parsed)
-            print(parsed["reply"])
-            print(parsed["intent"])
-            print(parsed["data"])
+            valid, error = validate_action(parsed)
+
+            if not valid:
+                return Response(
+                    {"error": error},
+                    status=400
+                )
+
+            result = execute_action(
+                request.user,
+                parsed
+            )
+
+            if not result["success"]:
+                return Response(
+                    {"error": result["message"]},
+                    status=400
+                )
 
             ChatMessage.objects.create(
                 chat=chat,
                 role="assistant",
-                content=reply
+                content=parsed["reply"]
             )
 
             return Response({
-                "reply": reply
+                "reply": parsed["reply"]
             })
 
         except Exception:
