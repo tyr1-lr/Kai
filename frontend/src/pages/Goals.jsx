@@ -1,215 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookOpenText, BriefcaseBusiness, WalletMinimal, Sprout, Pencil, Trash2 } from "lucide-react";
+import api from "../api";
 
 function Goals(){
-    const goals = [
-        {
-            id: 1,
-            title: "Learn Django Backend",
-            description: "Master Django, Django REST Framework, databases, and deployment.",
-            category: "Learning",
-            priority: "High",
-            targetProgress: 100,
-            dueDate: "2026-06-30",
-            status: "In Progress",
-            color: "purple",
-            milestones: [
-                {
-                    id: 1,
-                    title: "Learn Django Models",
-                    completed: true
-                },
-                {
-                    id: 2,
-                    title: "Build REST API",
-                    completed: true
-                },
-                {
-                    id: 3,
-                    title: "Deploy Application",
-                    completed: false
-                }
-            ]
-        },
-
-        {
-            id: 2,
-            title: "Build Portfolio Website",
-            description: "Create and deploy a personal portfolio.",
-            category: "Career",
-            priority: "Medium",
-            targetProgress: 100,
-            dueDate: "2026-07-15",
-            status: "In Progress",
-            color: "blue",
-            milestones: [
-                {
-                    id: 1,
-                    title: "Design UI",
-                    completed: true
-                },
-                {
-                    id: 2,
-                    title: "Build Components",
-                    completed: false
-                },
-                {
-                    id: 3,
-                    title: "Deploy Site",
-                    completed: false
-                }
-            ]
-        },
-
-        {
-            id: 3,
-            title: "Save ₱20,000",
-            description: "Build an emergency fund.",
-            category: "Finance",
-            priority: "Medium",
-            targetProgress: 100,
-            dueDate: "2026-12-31",
-            status: "In Progress",
-            color: "green",
-            milestones: [
-                {
-                    id: 1,
-                    title: "Save ₱5,000",
-                    completed: true
-                },
-                {
-                    id: 2,
-                    title: "Save ₱10,000",
-                    completed: true
-                },
-                {
-                    id: 3,
-                    title: "Save ₱20,000",
-                    completed: false
-                }
-            ]
-        },
-
-        {
-            id: 4,
-            title: "Read 12 Books",
-            description: "Read one self-improvement book every month.",
-            category: "Personal Growth",
-            priority: "Low",
-            targetProgress: 100,
-            dueDate: "2026-08-20",
-            status: "In Progress",
-            color: "orange",
-            milestones: [
-                {
-                    id: 1,
-                    title: "Book 1",
-                    completed: true
-                },
-                {
-                    id: 2,
-                    title: "Book 2",
-                    completed: true
-                },
-                {
-                    id: 3,
-                    title: "Book 3",
-                    completed: true
-                },
-                {
-                    id: 4,
-                    title: "Book 4",
-                    completed: false
-                },
-                {
-                    id: 5,
-                    title: "Book 5",
-                    completed: false
-                },
-                {
-                    id: 6,
-                    title: "Book 6",
-                    completed: false
-                },
-                {
-                    id: 7,
-                    title: "Book 7",
-                    completed: false
-                },
-                {
-                    id: 8,
-                    title: "Book 8",
-                    completed: false
-                },
-                {
-                    id: 9,
-                    title: "Book 9",
-                    completed: false
-                },
-                {
-                    id: 10,
-                    title: "Book 10",
-                    completed: false
-                },
-                {
-                    id: 11,
-                    title: "Book 11",
-                    completed: false
-                },
-                {
-                    id: 12,
-                    title: "Book 12",
-                    completed: false
-                }
-            ]
-        },
-
-        {
-            id: 5,
-            title: "Get React Certification",
-            description: "Complete an advanced React certification course.",
-            category: "Learning",
-            priority: "High",
-            targetProgress: 100,
-            dueDate: "2026-05-30",
-            status: "Completed",
-            color: "purple",
-            milestones: [
-                {
-                    id: 1,
-                    title: "Finish Course",
-                    completed: true
-                },
-                {
-                    id: 2,
-                    title: "Pass Assessment",
-                    completed: true
-                }
-            ]
-        }
-    ];
-
-    const addMilestone = () => {
-        setFormData({
-            ...formData,
-            milestones: [
-                ...formData.milestones,
-                {
-                    id: Date.now(),
-                    title: "",
-                    completed: false,
-                },
-            ],
-        });
-    };
+    const [goals, setGoals] = useState([]);
+    const [filter, setFilter] = useState("ALL")
+    const [selectedGoal, setSelectedGoal] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     const [formData, setFormData] = useState({
             title: "",
             description: "",
-            category: "Learning",
-            priority: "Medium",
-            dueDate: "",
-            status: "In Progress",
+            category: "LEARNING",
+            priority: "MEDIUM",
+            target_date: "",   
             milestones: [],
         });
 
@@ -222,18 +26,16 @@ function Goals(){
                 description: goal.description,
                 category: goal.category,
                 priority: goal.priority,
-                dueDate: goal.dueDate,
-                status: goal.status,
+                target_date: goal.target_date,
                 milestones: goal.milestones,
             });
         } else {
             setFormData({
                 title: "",
                 description: "",
-                category: "Learning",
-                priority: "Medium",
-                dueDate: "",
-                status: "In Progress",
+                category: "LEARNING",
+                priority: "MEDIUM",
+                target_date: "",
                 milestones: [],
             });
         }
@@ -241,17 +43,152 @@ function Goals(){
         setIsOpen(true);
     };
 
-    const goalStats = {
-        activeGoals: 4,
-        completedGoals: 1,
-        successRate: 87,
-        upcomingDeadlines: 3
+    useEffect (() => {
+        getGoals();
+    }, []);
+
+    const getGoals = () => {
+        api.get("/api/goals/").then((res) => res.data).then((data) => {
+            setGoals(data);
+            console.log(data);
+        })
+        .catch((err) => alert(err));
     };
 
-    const [filter, setFilter] = useState("In Progress")
-    const [selectedGoal, setSelectedGoal] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const deleteGoal = async (id) => {
+        try {
+            const res = await api.delete(`/api/goals/delete/${id}/`);
 
+            if (res.status === 204) {
+                alert("Goal deleted!");
+                getGoals();
+            } else {
+                alert("Failed to delete goal.");
+            }
+        } catch (err) {
+            console.log(err.response?.data);
+            alert("Failed to delete goal.");
+        }
+    };
+
+    const createGoal = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await api.post("/api/goals/", {
+                title: formData.title,
+                description: formData.description,
+                category: formData.category,
+                priority: formData.priority,
+                target_date: formData.target_date,
+            });
+
+            const goal = res.data;
+
+            for (const milestone of formData.milestones) {
+                await createMilestone(goal.id, milestone);
+            }
+
+            alert("Goal created!");
+
+            setIsOpen(false);
+            getGoals();
+
+        } catch (err) {
+            console.log(err.response?.data);
+        }
+    };
+
+    const editGoal = async (e) => {
+        e.preventDefault();
+
+        try {
+            await api.patch(`/api/goals/${selectedGoal.id}/`, {
+                title: formData.title,
+                description: formData.description,
+                category: formData.category,
+                priority: formData.priority,
+                target_date: formData.target_date,
+            });
+
+            for (const milestone of formData.milestones) {
+
+                if (milestone.isNew) {
+                    await createMilestone(selectedGoal.id, milestone);
+                } else {
+                    await editMilestone(milestone.id, milestone);
+                }
+            }
+
+            alert("Goal updated!");
+            setIsOpen(false);
+            getGoals();
+
+        } catch (err) {
+            console.log(err);
+            console.log(err.response);
+            console.log(err.response?.data);
+            alert(JSON.stringify(err.response?.data));
+        }
+    };
+
+    const addMilestone = () => {
+        setFormData(prev => ({
+            ...prev,
+            milestones: [
+                ...prev.milestones,
+                {
+                    id: Date.now(),
+                    title: "",
+                    is_completed: false,
+                    isNew: true,
+                },
+            ],
+        }));
+    };
+
+    const createMilestone = async (goalId, milestone) => {
+        await api.post(`/api/goals/${goalId}/milestones/`, {
+            title: milestone.title,
+            is_completed: milestone.is_completed,
+        });
+    };
+
+    const editMilestone = async (id, milestone) => {
+        await api.patch(`/api/milestones/${id}/`, {
+            title: milestone.title,
+            is_completed: milestone.is_completed,
+        });
+    };
+
+    const deleteMilestone = async (id) => {
+        await api.delete(`/api/milestones/delete/${id}/`);
+    };
+
+    const activeGoals = goals.filter(goal => goal.progress < 100).length;
+
+    const completedGoals = goals.filter(goal => goal.progress === 100).length;
+
+    const successRate =
+        goals.length === 0
+            ? 0
+            : Math.round((completedGoals / goals.length) * 100);
+
+    const upcomingDeadlines = goals.filter(goal => {
+        const today = new Date();
+
+        const next30 = new Date();
+        next30.setDate(today.getDate() + 30);
+
+        const deadline = new Date(goal.target_date);
+
+        return (
+            deadline >= today &&
+            deadline <= next30 &&
+            goal.progress < 100
+        );
+    }).length;
+  
 
     return(
             <div>
@@ -279,7 +216,7 @@ function Goals(){
                         </h1>
 
                         <span className="text-white text-5xl ">
-                            {goalStats.activeGoals}
+                            {activeGoals}
                         </span>
                             
                         <p className="text-white text-sm">
@@ -299,7 +236,7 @@ function Goals(){
                         </h1>
 
                         <span className="text-white text-5xl ">
-                            {goalStats.completedGoals}
+                            {completedGoals}
                         </span>
                             
                         <p className="text-white text-sm">
@@ -319,7 +256,7 @@ function Goals(){
                         </h1>
 
                         <span className="text-white text-5xl ">
-                            {goalStats.successRate}%
+                            {successRate}%
                         </span>
                             
                         <p className="text-white text-sm">
@@ -339,7 +276,7 @@ function Goals(){
                         </h1>
 
                         <span className="text-white text-5xl ">
-                            {goalStats.upcomingDeadlines}
+                            {upcomingDeadlines}
                         </span>
                             
                         <p className="text-white text-sm">
@@ -356,9 +293,20 @@ function Goals(){
             <div className="h-20 px-4 flex items-center items-start h-full flex-col gap-4">
                 <div className="flex flex-row items-left h-8 gap-6 mt-5">
                     <button
-                        onClick={() => setFilter("In Progress")}
+                        onClick={() => setFilter("All")}
                         className={`text-xl cursor-pointer ml-25 pb-2 ${
-                            filter === "In Progress"
+                            filter === "All"
+                                ? "text-white border-b-2 border-purple-500"
+                                : "text-gray-400"
+                        }`}
+                    >
+                        All
+                    </button>
+
+                    <button
+                        onClick={() => setFilter("Active")}
+                        className={`text-xl cursor-pointer pb-2 ${
+                            filter === "Active"
                                 ? "text-white border-b-2 border-purple-500"
                                 : "text-gray-400"
                         }`}
@@ -381,37 +329,38 @@ function Goals(){
                 <div className=" h-[370px] overflow-y-auto">
                     <ul className="flex ml-10 w-[1190px] flex-col text-white gap-2 rounded-md">
                         {goals
-                            .filter((goal) => goal.status === filter)
+                            .filter((goal) => {
+                                if (filter === "Active") {
+                                    return goal.progress < 100;
+                                }
+
+                                if (filter === "Completed") {
+                                    return goal.progress === 100;
+                                }
+
+                                return true;
+                            })
                             .map((goal) => {
-
-                                const completedMilestones = goal.milestones.filter(
-                                    milestone => milestone.completed
-                                ).length;
-
-                                const progress = Math.round(
-                                    (completedMilestones / goal.milestones.length) * 100
-                                );
-
                                 const priorityColors = {
-                                    High: "bg-red-500/20 text-red-400",
-                                    Medium: "bg-orange-500/20 text-orange-400",
-                                    Low: "bg-green-500/20 text-green-400",
+                                    HIGH: "bg-red-500/20 text-red-400",
+                                    MEDIUM: "bg-orange-500/20 text-orange-400",
+                                    LOW: "bg-green-500/20 text-green-400",
                                 };
 
                                 const categoryConfig = {
-                                    Learning: {
+                                    LEARNING: {
                                         icon: BookOpenText,
                                         color: "bg-purple-700 text-white",
                                     },
-                                    Career: {
+                                    CAREER: {
                                         icon: BriefcaseBusiness,
                                         color: "bg-blue-700 text-white",
                                     },
-                                    Finance: {
+                                    FINANCE: {
                                         icon: WalletMinimal,
                                         color: "bg-green-700 text-white",
                                     },
-                                    "Personal Growth": {
+                                    PERSONAL_GROWTH: {
                                         icon: Sprout,
                                         color: "bg-orange-700 text-white",
                                     },
@@ -430,37 +379,57 @@ function Goals(){
                                         </div>
 
                                         <div className="flex w-full justify-between items-center px-4">
-                                            <div className="flex flex-col items-start w-110">
+                                            <div className="flex flex-col items-start w-[300px]">
                                                 <h1 className="text-lg">
                                                     {goal.title}
                                                 </h1>
                                             
                                                 <p className="text-sm">
-                                                    {goal.description.length > 50
-                                                        ? goal.description.slice(0, 50) + "..."
+                                                    {goal.description.length > 40
+                                                        ? goal.description.slice(0, 40) + "..."
                                                         : goal.description}
                                                 </p>
                                             </div>
                                             
-                                            <div className="w-100 ml-8">
+                                            <div className="w-120">
                                                 <div className="flex justify-between text-sm mb-1">
-                                                    <span>{progress}%</span>
+                                                    <span>{goal.progress}%</span>
                                                     <span>
-                                                        {completedMilestones}/{goal.milestones.length}
+                                                        {
+                                                        goal.milestones.filter(m => m.is_completed).length
+                                                        }
+                                                        /
+                                                        {goal.milestones.length}
                                                     </span>
                                                 </div>
 
                                                 <div className="w-full h-2 bg-[#2A3145] rounded-full overflow-hidden">
                                                     <div
                                                         className="h-full bg-purple-500 transition-all duration-300"
-                                                        style={{ width: `${progress}%` }}
+                                                        style={{
+                                                            width: `${goal.progress}%`
+                                                        }}
                                                     />
                                                 </div>
                                             </div>
 
+                                            <button
+                                                type="button"
+                                                className="flex items-center text-red-400 hover:text-red-300 cursor-pointer ml-6"
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+
+                                                    if (!window.confirm(`Delete "${goal.title}"?`)) return;
+
+                                                    await deleteGoal(goal.id);
+                                                }}
+                                            >
+                                                <Trash2 size={22} />
+                                            </button>
+
                                             <div className="flex flex-col items-end justify-between h-full ml-auto gap-4">
                                                 <span>
-                                                    {goal.dueDate}
+                                                    {goal.target_date}
                                                 </span>
 
                                                 <span className={`${priorityColor} h-8 w-16 flex items-center justify-center rounded-md`}>
@@ -479,12 +448,14 @@ function Goals(){
             {isOpen && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
-                        <div className="h-160 w-400 border border-[#40424C] bg-[#121726] rounded-lg px-2 flex-col flex pt-4">
+                        <form onSubmit={selectedGoal ? editGoal : createGoal} className="h-160 w-400 border border-[#40424C] bg-[#121726] rounded-lg px-2 flex-col flex pt-4">
                             <div className="flex flex-row items-center justify-center px-2">
                                 <h1 className="text-white text-lg font-bold px-4 items-center flex">
                                 {selectedGoal ? "Edit Goal" : "Create New Goal"}
                                 </h1>
-                                <button className="ml-auto cursor-pointer text-base flex flex-row items-center justify-center"
+                                <button 
+                                type="button"
+                                className="ml-auto cursor-pointer text-base flex flex-row items-center justify-center"
                                 onClick={() => setIsOpen(false)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hover:text-red-600 text-white mr-4 ml-auto lucide lucide-x-icon lucide-x">
                                         <path d="M18 6 6 18"/>
@@ -527,10 +498,10 @@ function Goals(){
                                                 }
                                                 className="w-full h-11 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
                                             >
-                                                <option value="Learning">Learning</option>
-                                                <option value="Career">Career</option>
-                                                <option value="Finance">Finance</option>
-                                                <option value="Personal Growth">Personal Growth</option>
+                                                <option value="LEARNING">Learning</option>
+                                                <option value="CAREER">Career</option>
+                                                <option value="FINANCE">Finance</option>
+                                                <option value="PERSONAL_GROWTH">Personal Growth</option>
                                             </select>
                                         </div>
                                     </div>
@@ -557,11 +528,11 @@ function Goals(){
                                             </h2>
                                             <input
                                                 type="date"
-                                                value={formData.dueDate}
+                                                value={formData.target_date}
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
-                                                        dueDate: e.target.value,
+                                                        target_date: e.target.value,
                                                     })
                                                 }
                                                 className="w-full mb-3 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
@@ -583,9 +554,9 @@ function Goals(){
                                                 }
                                                 className="w-full h-11 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
                                             >
-                                                <option value="High">High</option>
-                                                <option value="Medium">Medium</option>
-                                                <option value="Low">Low</option>
+                                                <option value="HIGH">High</option>
+                                                <option value="MEDIUM">Medium</option>
+                                                <option value="LOW">Low</option>
                                             </select>
                                         </div>
                                     </div>
@@ -594,13 +565,7 @@ function Goals(){
                                         <div className="flex justify-between text-white mb-2">
                                             <span>Progress</span>
                                             <span>
-                                                {selectedGoal?.milestones?.length
-                                                    ? Math.round(
-                                                        (selectedGoal.milestones.filter(m => m.completed).length /
-                                                            selectedGoal.milestones.length) *
-                                                        100
-                                                    )
-                                                    : 0}%
+                                                {selectedGoal?.progress ?? 0}%
                                             </span>
                                         </div>
 
@@ -608,15 +573,7 @@ function Goals(){
                                             <div
                                                 className="bg-indigo-500 h-3 rounded-full transition-all duration-300"
                                                 style={{
-                                                    width: `${
-                                                        selectedGoal?.milestones?.length
-                                                            ? Math.round(
-                                                                (selectedGoal.milestones.filter(m => m.completed).length /
-                                                                    selectedGoal.milestones.length) *
-                                                                100
-                                                            )
-                                                            : 0
-                                                    }%`
+                                                    width: `${selectedGoal?.progress ?? 0}%`
                                                 }}
                                             />
                                         </div>
@@ -630,51 +587,69 @@ function Goals(){
                                         </h1>
 
                                         <button
+                                            type="button"
                                             onClick={addMilestone}
-                                            className="text-indigo-600 cursor-pointer hover:text-[#2A3145] text-base flex flex-row ml-auto"
+                                            className="text-indigo-600 cursor-pointer hover:text-[#2A3145] flex ml-auto"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M5 12h14"/>
                                                 <path d="M12 5v14"/>
                                             </svg>
 
-                                            <span>New Goal</span>
+                                            <span>New Milestone</span>
                                         </button>
                                     </div>
 
                                     <div className="flex flex-col gap-2 p-4 h-[450px] overflow-y-auto">
-                                        {formData.milestones.map((milestone) => (
+                                        {formData.milestones.map((milestone, index) => (
                                             <div
                                                 key={milestone.id}
                                                 className="flex items-center gap-2 bg-[#0D1020] border border-[#40424C] rounded p-2"
                                             >
                                                 <input
                                                     type="checkbox"
-                                                    checked={milestone.completed}
-                                                    onChange={() => {
-                                                        const updatedMilestones = formData.milestones.map((m) =>
-                                                            m.id === milestone.id
-                                                                ? { ...m, completed: !m.completed }
-                                                                : m
-                                                        );
-
-                                                        setFormData({
-                                                            ...formData,
-                                                            milestones: updatedMilestones,
-                                                        });
+                                                    checked={milestone.is_completed}
+                                                    onChange={(e)=>{
+                                                        setFormData(prev=>({
+                                                            ...prev,
+                                                            milestones: prev.milestones.map(m =>
+                                                                m.id===milestone.id
+                                                                    ? {...m,is_completed:e.target.checked}
+                                                                    : m
+                                                            )
+                                                        }));
                                                     }}
                                                 />
 
-                                                <span className="flex-1 text-white">
-                                                    {milestone.title}
-                                                </span>
-
-                                                <button className="cursor-pointer mr-3 text-blue-400 hover:text-blue-300 ">
-                                                    <Pencil size={18} />
-                                                </button>
+                                                <input
+                                                    value={milestone.title}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            milestones: prev.milestones.map(m =>
+                                                                m.id === milestone.id
+                                                                    ? { ...m, title: e.target.value }
+                                                                    : m
+                                                            ),
+                                                        }));
+                                                    }}
+                                                />
 
                                                 <button className="cursor-pointer text-red-400 hover:text-red-300">
-                                                    <Trash2 size={18} />
+                                                    <Trash2 size={18} 
+                                                    onClick={async () => {
+                                                        if (!milestone.isNew) {
+                                                            await deleteMilestone(milestone.id);
+                                                        }
+
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            milestones: prev.milestones.filter(
+                                                                m => m.id !== milestone.id
+                                                            ),
+                                                        }));
+
+                                                    }}/>
                                                 </button>
                                             </div>
                                         ))}
@@ -684,18 +659,21 @@ function Goals(){
 
                             <div className="grid grid-cols-2 gap-4 px-4">
                                 <button
+                                type="button"
                                 className="w-full h-16 text-white border cursor-pointer border-[#40424C] rounded hover:bg-[#1f2a3d] "
                                 onClick={() => setIsOpen(false)}
                                 >
                                     Cancel
                                 </button>
 
-                                <button className="w-full bg-indigo-700 cursor-pointer text-white rounded hover:bg-indigo-600">
+                                <button 
+                                type="submit"
+                                className="w-full bg-indigo-700 cursor-pointer text-white rounded hover:bg-indigo-600">
                                     {selectedGoal ? "Save Changes" : "Create Goal"}
                                 </button>
                             </div>
 
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}
