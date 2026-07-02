@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/', include('note.urls')),
     path('api/', include('aichat.urls')),
     path('api/', include('goal.urls')),
+    path('api/', include('calendarapp.urls')),
 ]

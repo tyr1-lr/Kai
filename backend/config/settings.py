@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "note",
     "aichat",
     "goal",
+    "calendarapp",
 ]
 
 MIDDLEWARE = [

@@ -1,145 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import api from "../api";
 
 
 function Calendar() {
-
-    const events = [
-        {
-            id: 1,
-            title: "Study Django",
-            date: "2026-06-01",
-            time: "10:00 AM",
-            category: "Learning",
-            color: "purple"
-        },
-        {
-            id: 2,
-            title: "Goal Deadline",
-            date: "2026-06-02",
-            time: "11:59 PM",
-            category: "Goal",
-            color: "green"
-        },
-        {
-            id: 3,
-            title: "Team Meeting",
-            date: "2026-06-04",
-            time: "11:00 AM",
-            category: "Career",
-            color: "blue"
-        },
-        {
-            id: 4,
-            title: "Read Book",
-            date: "2026-06-06",
-            time: "2:00 PM",
-            category: "Personal Growth",
-            color: "orange"
-        },
-        {
-            id: 5,
-            title: "Build Backend",
-            date: "2026-06-09",
-            time: "2:00 PM",
-            category: "Learning",
-            color: "purple"
-        },
-        {
-            id: 6,
-            title: "AI Chat Session",
-            date: "2026-06-17",
-            time: "6:00 PM",
-            category: "Career",
-            color: "blue"
-        },
-        {
-            id: 7,
-            title: "Portfolio Review",
-            date: "2026-06-20",
-            time: "10:00 AM",
-            category: "Career",
-            color: "green"
-        },
-        {
-            id: 8,
-            title: "Write Notes",
-            date: "2026-06-24",
-            time: "9:00 AM",
-            category: "Learning",
-            color: "purple"
-        },
-        {
-            id: 9,
-            title: "Goal Deadline",
-            date: "2026-06-30",
-            time: "11:59 PM",
-            category: "Goal",
-            color: "orange"
-        }
-    ];
-
-    const eventColors = {
-        purple: "bg-purple-500/20 text-purple-300",
-        blue: "bg-blue-500/20 text-blue-300",
-        green: "bg-green-500/20 text-green-300",
-        orange: "bg-orange-500/20 text-orange-300",
-    };
-
-    const todaysEvents = [
-        {
-            id: 1,
-            time: "9:00 AM",
-            title: "Write Notes",
-            color: "bg-purple-300",
-            bg: "bg-purple-500/20"
-        },
-        {
-            id: 2,
-            time: "11:00 AM",
-            title: "Team Meeting",
-            color: "bg-blue-300",
-            bg: "bg-blue-500/20"
-        },
-        {
-            id: 3,
-            time: "2:00 PM",
-            title: "Build Backend",
-            color: "bg-purple-300",
-            bg: "bg-purple-500/20"
-        },
-        {
-            id: 4,
-            time: "6:00 PM",
-            title: "AI Chat Session",
-            color: "bg-blue-300",
-            bg: "bg-blue-500/20"
-        },
-        {
-            id: 5,
-            time: "6:00 PM",
-            title: "AI Chat Session",
-            color: "bg-blue-300",
-            bg: "bg-blue-500/20"
-        },
-        {
-            id: 6,
-            time: "6:00 PM",
-            title: "AI Chat Session",
-            color: "bg-blue-300",
-            bg: "bg-blue-500/20"
-        },
-        {
-            id: 7,
-            time: "6:00 PM",
-            title: "AI Chat Session",
-            color: "bg-blue-300",
-            bg: "bg-blue-500/20"
-        }
-    ];
+    const [events, setEvents] = useState([]);
+    const [reminders, setReminders] = useState([]);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [editingReminder, setEditingReminder] = useState(null);
 
     const [eventData, setEventData] = useState({
         title: "",
@@ -155,9 +26,239 @@ function Calendar() {
         notes: "",
         date: "",
         time: "",
-        reminderTime: "",
-        repeat: "",
+        repeat: "NEVER",
     });
+    const [enableReminder, setEnableReminder] = useState(false);
+
+    const getCalendar = async () => {
+        try {
+            const response = await api.get("api/calendar/");
+
+            setEvents(response.data.events);
+            setReminders(response.data.reminders);
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const createEvent = async () => {
+
+        if (enableReminder && !eventData.reminderTime) {
+            alert("Please choose a reminder time.");
+            return;
+        }
+        try {
+            await api.post("api/events/", {
+                title: eventData.title,
+                date: eventData.date,
+                start_time: eventData.startTime,
+                end_time: eventData.endTime,
+                description: eventData.description,
+                is_reminder: enableReminder,
+                reminder_time: enableReminder
+                    ? eventData.reminderTime
+                    : null,
+            });
+
+            getCalendar();
+
+            setIsEventModalOpen(false);
+
+            setEventData({
+                title: "",
+                date: "",
+                startTime: "",
+                endTime: "",
+                description: "",
+                reminderTime: "",
+            });
+            setEnableReminder(false);
+
+        } catch (err) {
+            console.log(err.response?.data);
+        }
+    };
+
+    const editEvent = (event) => {
+        setEditingEvent(event);
+
+        setEventData({
+            title: event.title,
+            date: event.date,
+            startTime: event.start_time,
+            endTime: event.end_time,
+            description: event.description,
+            reminderTime: event.reminder_time || "",
+        });
+
+        setEnableReminder(event.is_reminder);
+
+        setIsEventDetailsOpen(false);
+        setIsEventModalOpen(true);
+    };
+
+    const updateEvent = async () => {
+        try {
+            await api.put(`api/events/${editingEvent.id}/`, {
+                title: eventData.title,
+                date: eventData.date,
+                start_time: eventData.startTime,
+                end_time: eventData.endTime,
+                description: eventData.description,
+                is_reminder: enableReminder,
+                reminder_time: enableReminder
+                    ? eventData.reminderTime
+                    : null,
+            });
+
+            await getCalendar();
+
+            setEditingEvent(null);
+
+            setEventData({
+                title: "",
+                date: "",
+                startTime: "",
+                endTime: "",
+                description: "",
+                reminderTime: "",
+            });
+
+            setEnableReminder(false);
+
+            setIsEventModalOpen(false);
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const deleteEvent = async (id) => {
+        try {
+            await api.delete(`api/events/delete/${id}/`);
+
+            await getCalendar();
+
+            setIsEventDetailsOpen(false);
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const createReminder = async () => {
+        if (!reminderData.title.trim()) {
+            alert("Please enter a title.");
+            return;
+        }
+
+        if (!reminderData.date) {
+            alert("Please select a date.");
+            return;
+        }
+
+        if (!reminderData.time) {
+            alert("Please select a time.");
+            return;
+        }
+
+        try {
+            await api.post("api/reminders/", {
+                title: reminderData.title,
+                description: reminderData.notes,
+                date: reminderData.date,
+                time: reminderData.time,
+                repeat: reminderData.repeat || "NEVER",
+            });
+
+            await getCalendar();
+
+            setReminderData({
+                title: "",
+                notes: "",
+                date: "",
+                time: "",
+                repeat: "NEVER",
+            });
+
+            setIsReminderModalOpen(false);
+
+        } catch (err) {
+            console.log(err.response?.data);
+        }
+    };
+
+    const editReminder = (reminder) => {
+        setEditingReminder(reminder);
+
+        setReminderData({
+            title: reminder.title,
+            notes: reminder.description,
+            date: reminder.date,
+            time: reminder.time,
+            repeat: reminder.repeat,
+        });
+
+        setIsReminderDetailsOpen(false);
+        setIsReminderModalOpen(true);
+    };
+
+    const updateReminder = async () => {
+        try {
+            await api.put(
+                `api/reminders/${editingReminder.id}/`,
+                {
+                    title: reminderData.title,
+                    description: reminderData.notes,
+                    date: reminderData.date,
+                    time: reminderData.time,
+                    repeat: reminderData.repeat,
+                }
+            );
+
+            await getCalendar();
+
+            setEditingReminder(null);
+
+            setReminderData({
+                title: "",
+                notes: "",
+                date: "",
+                time: "",
+                repeat: "NEVER",
+            });
+
+            setIsReminderModalOpen(false);
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const deleteReminder = async (id) => {
+        try {
+            await api.delete(`api/reminders/delete/${id}/`);
+
+            getCalendar();
+
+            setIsReminderDetailsOpen(false);
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    useEffect(() => {
+        getCalendar();
+    }, []);
+
+    const eventColors = {
+        purple: "bg-purple-500/20 text-purple-300",
+        blue: "bg-blue-500/20 text-blue-300",
+        green: "bg-green-500/20 text-green-300",
+        orange: "bg-orange-500/20 text-orange-300",
+    };
 
     const today = new Date();
     const dayOfMonth = today.getDate();
@@ -224,6 +325,13 @@ function Calendar() {
         return events.filter(event => event.date === dateStr);
     };
 
+    const getRemindersForDay = (day) => {
+        const dateStr =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        return reminders.filter(reminder => reminder.date === dateStr);
+    };
+
     const prevMonth = () => {
         setCurrentDate(
             new Date(year, month - 1, 1)
@@ -276,6 +384,37 @@ function Calendar() {
 
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
     const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
+    const [selectedReminder, setSelectedReminder] = useState(null);
+    const [isReminderDetailsOpen, setIsReminderDetailsOpen] = useState(false);
+
+    const [selectedDate, setSelectedDate] = useState(
+        `${todayYear}-${String(todayMonth + 1).padStart(2, "0")}-${String(todayDate).padStart(2, "0")}`
+    );
+    const selectDay = (day) => {
+        const clickedDate =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        setSelectedDate(clickedDate);
+    };
+
+    const selectedDayEvents = events.filter(
+        event => event.date === selectedDate
+    );
+    const selectedDayReminders = reminders.filter(
+        reminder => reminder.date === selectedDate
+    );
+
+    const openEventModal = (event) => {
+        setSelectedEvent(event);
+        setIsEventDetailsOpen(true);
+    };
+
+    const openReminderModal = (reminder) => {
+        setSelectedReminder(reminder);
+        setIsReminderDetailsOpen(true);
+    };
 
     return (
         <div className="p-4 bg-[#0D1020] h-[695px] w-[1305px] text-white">
@@ -331,11 +470,23 @@ function Calendar() {
                                     month === todayMonth &&
                                     day === todayDate;
 
+                                const dateStr =
+                                    day &&
+                                    `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+                                const isSelected = dateStr === selectedDate;
+
                                 return(
                                     <div
                                         key={idx}
-                                        className={`h-[70px] border border-white/10 p-2 text-sm font-bold text-white
-                                        ${isToday ? "bg-blue-500/20 border-blue-400" : ""}`}
+                                        onClick={() => day && selectDay(day)}
+                                        className={`h-[70px] border p-2 text-sm font-bold text-white cursor-pointer transition
+                                        ${
+                                            isSelected
+                                                ? "bg-blue-500/30 border-blue-400"
+                                                : "border-white/10 hover:bg-white/5"
+                                        }
+                                        `}
                                     >
                                         {day && (
                                             <>
@@ -344,19 +495,35 @@ function Calendar() {
                                                 <div className="mt-1 space-y-1">
                                                     {getEventsForDay(day).map(event => (
                                                         <div
-                                                            key={event.id}
-                                                            className={`flex flex-col px-4 rounded-md text-xs text-blue-300 truncate ${eventColors[event.color]}`}
+                                                            key={`event-${event.id}`}
+                                                            className={`flex flex-col px-2 rounded-md text-xs truncate ${eventColors[event.color]}`}
                                                         >
                                                             <span>
                                                                 {event.title.length > 10
                                                                     ? event.title.slice(0, 10) + "..."
                                                                     : event.title}
                                                             </span>
+
                                                             <span>
-                                                                {event.time}
-                                                            </span>                       
+                                                                {event.start_time} - {event.end_time}
+                                                            </span>
                                                         </div>
                                                     ))}
+
+                                                    {getRemindersForDay(day).map(reminder => (
+                                                        <div
+                                                            key={`reminder-${reminder.id}`}
+                                                            className="flex items-center gap-1 px-2 rounded-md bg-blue-500/20 text-blue-300 text-xs truncate"
+                                                        >
+                                                            🔔
+                                                            <span>
+                                                                {reminder.title.length > 10
+                                                                    ? reminder.title.slice(0, 10) + "..."
+                                                                    : reminder.title}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+
                                                 </div>
                                             </>
                                         )}
@@ -420,17 +587,26 @@ function Calendar() {
                             ))}
 
                             {miniDays.map((miniDay, idx) => {
-                                const isToday =
-                                    miniDay &&
-                                    miniYear === todayYear &&
-                                    miniMonth === todayMonth &&
-                                    miniDay === todayDate;
+                                const currentMiniDate =
+                                    miniDay
+                                        ? `${miniYear}-${String(miniMonth + 1).padStart(2, "0")}-${String(miniDay).padStart(2, "0")}`
+                                        : null;
+
+                                const isSelected = currentMiniDate === selectedDate;
 
                                 return(
                                     <div
                                         key={idx}
-                                        className={`h-5 p-2 text-xs flex flex-row justify-center items-center font-bold text-white
-                                        ${isToday ? "bg-blue-500 rounded-lg border-blue-400" : ""}`}
+                                        onClick={() => {
+                                            if (!miniDay) return;
+
+                                            setSelectedDate(currentMiniDate);
+                                        }}
+                                        className={`h-5 p-2 text-xs flex justify-center items-center font-bold text-white cursor-pointer
+                                        ${isSelected
+                                            ? "bg-blue-500 rounded-lg border-blue-400"
+                                            : "hover:bg-white/10 rounded-lg"
+                                        }`}
                                     >
                                         {miniDay && (
                                             <>
@@ -444,37 +620,165 @@ function Calendar() {
 
                     <div className="mb-4 px-2 mt-2 w-[355px] ">
                         <div className="flex flex-col mb-1">
-                            <h1 className="text-base font-bold">Today's Events</h1>
+                            <h1 className="text-base font-bold">
+                                Events
+                            </h1>
                             <span className="text-sm">
-                             {todayDayName}, {todayMonthName} {dayOfMonth}
+                                {new Date(selectedDate).toLocaleDateString("en-US", {
+                                    weekday: "long",
+                                    month: "long",
+                                    day: "numeric",
+                                })}
                             </span>
                         </div>
 
                         <div className="h-[260px] overflow-y-auto">
-                            <ul className="flex flex-col gap-2">
-                            {todaysEvents.map((todayseventt) => (
-                                <li key={todayseventt.id}>
-                                <div
-                                    className={`cursor-pointer rounded-md flex items-center px-4 gap-2 h-16 ${todayseventt.bg} hover:bg-[#1f2a3d]`}
-                                    onClick={() => openModal(todayseventt)}
-                                >
-                                    <span className={`inline-block w-3 h-3 ${todayseventt.color} rounded-full`} />
-                                    
-                                    <div className="flex flex-col">
-                                    <span className="text-sm">{todayseventt.time}</span>
-                                    <span className="text-xs">{todayseventt.title}</span>
-                                    </div>
+                        {selectedDayEvents.length === 0 &&
+                            selectedDayReminders.length === 0 ? (
+
+                                <div className="h-full flex items-center justify-center text-gray-500 text-sm">
+                                    No events or reminders for this day.
                                 </div>
-                                </li>
-                            ))}
-                            </ul>
-                        </div>
+
+                            ) : (
+
+                                <ul className="flex flex-col gap-2">
+
+                                    {selectedDayEvents.map((event) => (
+                                        <li key={`event-${event.id}`}>
+                                            <div
+                                                className={`cursor-pointer rounded-md flex items-center px-4 gap-2 h-16 ${eventColors[event.color]} hover:bg-[#1f2a3d]`}
+                                                onClick={() => openEventModal(event)}
+                                            >
+                                                <span
+                                                    className={`inline-block w-3 h-3 rounded-full ${
+                                                        event.color === "purple"
+                                                            ? "bg-purple-400"
+                                                            : event.color === "blue"
+                                                            ? "bg-blue-400"
+                                                            : event.color === "green"
+                                                            ? "bg-green-400"
+                                                            : "bg-orange-400"
+                                                    }`}
+                                                />
+
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm">
+                                                        {event.start_time} - {event.end_time}
+                                                    </span>
+
+                                                    <span className="text-xs">
+                                                        {event.title}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+
+                                    {selectedDayReminders.map((reminder) => (
+                                        <li key={`reminder-${reminder.id}`}>
+                                            <div
+                                                onClick={() => openReminderModal(reminder)}
+                                                className="cursor-pointer rounded-md flex items-center px-4 gap-3 h-14 bg-blue-500/20 border border-blue-500/30 hover:bg-[#1f2a3d]"
+                                            >
+                                                <span className="text-blue-300 text-lg">
+                                                    🔔
+                                                </span>
+
+                                                <div className="flex flex-col">
+
+                                                    <span className="text-sm">
+                                                        {reminder.time}
+                                                    </span>
+
+                                                    <span className="text-xs">
+                                                        {reminder.title}
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    ))}
+
+                                </ul>
+
+                            )}
+                    </div>
                     </div>
                         
                 </div>
 
 
             </div>
+
+            {isEventDetailsOpen && selectedEvent && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+
+                    <div className="bg-[#121726] rounded-lg w-[500px] p-6">
+
+                        <div className="flex justify-between items-center">
+
+                            <h1 className="text-xl font-bold">
+                                Event Details
+                            </h1>
+
+                            <button
+                                onClick={() => setIsEventDetailsOpen(false)}
+                            >
+                                ✕
+                            </button>
+
+                        </div>
+
+                        <div className="mt-6 space-y-4">
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Title</p>
+                                <p>{selectedEvent.title}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Date</p>
+                                <p>{selectedEvent.date}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Time</p>
+                                <p>{selectedEvent.time}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Category</p>
+                                <p><p>{selectedEvent.description || "No description."}</p></p>
+                            </div>
+
+                        </div>
+
+                        <div className="flex justify-end gap-3 mt-8">
+
+                            
+
+                            <button
+                                onClick={() => editEvent(selectedEvent)}
+                                className="px-4 py-2 rounded border border-white/10"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                onClick={() => deleteEvent(selectedEvent.id)}
+                                className="px-4 py-2 rounded bg-red-600"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
 
             {isEventModalOpen && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -495,7 +799,22 @@ function Calendar() {
                                 </div>   
 
                                 <button
-                                onClick={() => setIsEventModalOpen(false)}
+                                onClick={() => {
+                                    setEditingEvent(null);
+
+                                    setEventData({
+                                        title: "",
+                                        date: "",
+                                        startTime: "",
+                                        endTime: "",
+                                        description: "",
+                                        reminderTime: "",
+                                    });
+
+                                    setEnableReminder(false);
+
+                                    setIsEventModalOpen(false);
+                                }}
                                 className="ml-auto cursor-pointer hover:text-[#1f2a3d]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                                 </button>                             
@@ -529,8 +848,8 @@ function Calendar() {
                                         value={eventData.date}
                                         onChange={(e) =>
                                             setEventData({
-                                                ...formData,
-                                                Date: e.target.value,
+                                                ...eventData,
+                                                date: e.target.value,
                                             })
                                         }
                                         className="w-full mb-3 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
@@ -548,8 +867,8 @@ function Calendar() {
                                         value={eventData.startTime}
                                         onChange={(e) =>
                                             setEventData({
-                                            ...eventData,
-                                            startTime: e.target.value,
+                                                ...eventData,
+                                                startTime: e.target.value,
                                             })
                                         }
                                         />
@@ -565,8 +884,8 @@ function Calendar() {
                                         value={eventData.endTime}
                                         onChange={(e) =>
                                             setEventData({
-                                            ...eventData,
-                                            endTime: e.target.value,
+                                                ...eventData,
+                                                endTime: e.target.value,
                                             })
                                         }
                                         />
@@ -604,7 +923,12 @@ function Calendar() {
                                         </h1>
 
                                         <label className="relative inline-block w-12 h-7 cursor-pointer ml-auto">
-                                            <input type="checkbox" className="peer sr-only" />
+                                            <input
+                                                type="checkbox"
+                                                checked={enableReminder}
+                                                onChange={(e) => setEnableReminder(e.target.checked)}
+                                                className="peer sr-only"
+                                            />
 
                                             <div className="w-full h-full rounded-full bg-gray-600 transition peer-checked:bg-purple-600" />
 
@@ -612,31 +936,54 @@ function Calendar() {
                                         </label>
                                     </div>
                                     
-                                    <div className="mt-2">
-                                        <input
-                                            type="time"
-                                            value={eventData.reminderTime}
-                                            onChange={(e) =>
-                                                setEventData({
-                                                    ...eventData,
-                                                    reminderTime: e.target.value,
-                                                })
-                                            }
-                                            className="w-full h-11 px-3 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
-                                        />
-                                    </div>
+                                   {enableReminder && (
+                                        <div className="mt-2">
+                                            <input
+                                                type="time"
+                                                value={eventData.reminderTime}
+                                                onChange={(e) =>
+                                                    setEventData({
+                                                        ...eventData,
+                                                        reminderTime: e.target.value,
+                                                    })
+                                                }
+                                                className="w-full h-11 px-3 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="h-13 flex flex-row items-center px-4 mt-4 gap-4 justify-end">
                                         <button
                                         className="mt-1 h-10 w-20 border bg-[#0D1020] cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
-                                        onClick={() => setIsEventModalOpen(false)}>
+                                        onClick={() => {
+                                            setEditingEvent(null);
+
+                                            setEventData({
+                                                title: "",
+                                                date: "",
+                                                startTime: "",
+                                                endTime: "",
+                                                description: "",
+                                                reminderTime: "",
+                                            });
+
+                                            setEnableReminder(false);
+
+                                            setIsEventModalOpen(false);
+                                        }}>
                                             Cancel
                                         </button>
 
                                         <button
                                         className="mt-1 h-10 w-25 rounded-md text-whit bg-indigo-700 cursor-pointer hover:bg-[#1f2a3d]"
-                                        onClick={() => setIsEventModalOpen(false)}>
-                                            Add Event
+                                        onClick={() => {
+                                            if (editingEvent) {
+                                                updateEvent();
+                                            } else {
+                                                createEvent();
+                                            }
+                                        }}>
+                                            {editingEvent ? "Save Changes" : "Add Event"}
                                         </button>
                                     </div>
                                 </div>
@@ -652,9 +999,9 @@ function Calendar() {
             {isReminderModalOpen && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
-                        <div className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-3">
+                        <div className=" w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-3">
 
-                            <div className="flex flex-row items-center px-2 w-full h-15 gap-4">
+                            <div className="flex flex-row items-center px-2 w-full h-15 gap-4 pt-8">
                                 <div className="bg-[#1F2B46] text-blue-300 rounded-md ml-2 w-10 h-10 items-center justify-center flex">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></svg>
                                 </div>
@@ -668,7 +1015,19 @@ function Calendar() {
                                 </div>   
 
                                 <button
-                                onClick={() => setIsReminderModalOpen(false)}
+                               onClick={() => {
+                                    setEditingReminder(null);
+
+                                    setReminderData({
+                                        title: "",
+                                        notes: "",
+                                        date: "",
+                                        time: "",
+                                        repeat: "NEVER",
+                                    });
+
+                                    setIsReminderModalOpen(false);
+                                }}
                                 className="ml-auto cursor-pointer hover:text-[#1f2a3d]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                                 </button>                             
@@ -727,7 +1086,7 @@ function Calendar() {
                                             onChange={(e) =>
                                                 setReminderData({
                                                     ...reminderData,
-                                                    Date: e.target.value,
+                                                    date: e.target.value,
                                                 })
                                             }
                                             className="w-full mb-3 p-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white"
@@ -767,55 +1126,45 @@ function Calendar() {
                                     }
                                     className="w-full h-11 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
                                     >
-                                        <option value="Never">Never</option>
-                                        <option value="EveryDay">Every Day</option>
-                                        <option value="EveryWeek">Every Week</option>
-                                        <option value="EveryMonth">Every Month</option>
+                                        <option value="NEVER">Never</option>
+                                        <option value="EVERY_DAY">Every Day</option>
+                                        <option value="EVERY_WEEK">Every Week</option>
+                                        <option value="EVERY_MONTH">Every Month</option>
                                     </select>
                                 </div>
 
 
                                 <div className="h-25 mt-5 mb-4 border-t border-white/20">
-                                    <div className=" h-10 mt-2 flex flex-row items-center px-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400 lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></svg>
-                                        <h1 className="ml-2 text-sm">
-                                            Set Reminder
-                                        </h1>
-
-                                        <label className="relative inline-block w-12 h-7 cursor-pointer ml-auto">
-                                            <input type="checkbox" className="peer sr-only" />
-
-                                            <div className="w-full h-full rounded-full bg-gray-600 transition peer-checked:bg-purple-600" />
-
-                                            <div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition peer-checked:translate-x-5" />
-                                        </label>
-                                    </div>
-                                    
-                                    <div className="mt-2">
-                                        <input
-                                            type="time"
-                                            value={eventData.reminderTime}
-                                            onChange={(e) =>
-                                                setEventData({
-                                                    ...eventData,
-                                                    reminderTime: e.target.value,
-                                                })
-                                            }
-                                            className="w-full h-11 px-3 bg-[#0D1020] text-white rounded border-2 border-[#40424C]"
-                                        />
-                                    </div>
 
                                     <div className="h-13 flex flex-row items-center px-4 mt-4 gap-4 justify-end">
                                         <button
                                         className="mt-1 h-10 w-20 border bg-[#0D1020] cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
-                                        onClick={() => setIsReminderModalOpen(false)}>
+                                        onClick={() => {
+                                            setEditingReminder(null);
+
+                                            setReminderData({
+                                                title: "",
+                                                notes: "",
+                                                date: "",
+                                                time: "",
+                                                repeat: "NEVER",
+                                            });
+
+                                            setIsReminderModalOpen(false);
+                                        }}>
                                             Cancel
                                         </button>
 
                                         <button
                                         className="mt-1 h-10 w-30 rounded-md text-whit bg-blue-700 cursor-pointer hover:bg-[#1f2a3d]"
-                                        onClick={() => setIsReminderModalOpen(false)}>
-                                            Add Reminder
+                                        onClick={() => {
+                                            if (editingReminder) {
+                                                updateReminder();
+                                            } else {
+                                                createReminder();
+                                            }
+                                        }}>
+                                            {editingReminder ? "Save Changes" : "Add Reminder"}
                                         </button>
                                     </div>
                                 </div>
@@ -826,6 +1175,79 @@ function Calendar() {
 
                     </div>
                 </div>
+            )}
+
+            {isReminderDetailsOpen && selectedReminder && (
+
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+
+                    <div className="bg-[#121726] rounded-lg w-[500px] p-6">
+
+                        <div className="flex justify-between items-center">
+
+                            <h1 className="text-xl font-bold">
+                                Reminder Details
+                            </h1>
+
+                            <button
+                                onClick={() => setIsReminderDetailsOpen(false)}
+                            >
+                                ✕
+                            </button>
+
+                        </div>
+
+                        <div className="mt-6 space-y-4">
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Title</p>
+                                <p>{selectedReminder.title}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Notes</p>
+                                <p>{selectedReminder.description || "No notes."}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Date</p>
+                                <p>{selectedReminder.date}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Time</p>
+                                <p>{selectedReminder.time}</p>
+                            </div>
+
+                            <div>
+                                <p className="text-gray-400 text-sm">Repeat</p>
+                                <p>{selectedReminder.repeat}</p>
+                            </div>
+
+                        </div>
+
+                        <div className="flex justify-end gap-3 mt-8">
+
+                            <button
+                                onClick={() => editReminder(selectedReminder)}
+                                className="px-4 py-2 rounded border border-white/10"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                onClick={() => deleteReminder(selectedReminder.id)}
+                                className="px-4 py-2 rounded bg-red-600"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             )}
         </div>
     );
