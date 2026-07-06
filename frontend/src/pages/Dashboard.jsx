@@ -1,14 +1,94 @@
 import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import profile from "../assets/profile.png";
+import api from "../api";
 
 
 function Dashboard(){
+    
     const hour = new Date().getHours();
     const today = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
     });
+
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    const loadNotifications = async () => {
+        try {
+            const response = await api.get("api/notifications/");
+
+            setNotifications(response.data);
+
+            setUnreadCount(
+                response.data.filter(n => !n.is_read).length
+            );
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const checkNotificationsNow = async () => {
+        try {
+            await api.get("api/notifications/check/");
+
+            await loadNotifications();
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    useEffect(() => {
+
+        loadNotifications();
+
+        checkNotificationsNow();
+
+        const interval = setInterval(() => {
+            checkNotificationsNow();
+        }, 30000);
+
+        return () => clearInterval(interval);
+
+    }, []);
+
+    const handleRead = async (id) => {
+        try {
+            await api.patch(`api/notifications/read/${id}/`);
+
+            await loadNotifications();
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleReadAll = async () => {
+        try {
+            await api.patch("api/notifications/read-all/");
+
+            await loadNotifications();
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await api.delete(`api/notifications/delete/${id}/`);
+
+            await loadNotifications();
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     let greeting;
 
@@ -121,12 +201,110 @@ function Dashboard(){
     return(
         <div className="h-screen flex flex-col">
             <nav className="w-full flex flex-row h-16 justify-end text-white items-center p-10">
-                <button className="pr-8">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                    </svg>
-                </button>
+                <div className="relative pr-8">
+                    <button
+                        onClick={() => setShowNotifications(!showNotifications)}
+                        className="relative"
+                        >
 
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-6"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
+                            />
+                        </svg>
+
+                        {unreadCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 rounded-full w-5 h-5 flex justify-center items-center text-xs text-white">
+                                {unreadCount}
+                            </span>
+                        )}
+
+                    </button>
+
+                    {showNotifications && (
+                        <div className="absolute right-0 mt-3 w-96 bg-[#131A29] rounded-xl shadow-2xl border border-[#263248] z-50">
+                            <div className="absolute right-0 mt-3 w-96 bg-[#131A29] rounded-xl shadow-2xl border border-[#263248] z-50">
+
+                                <div className="flex items-center justify-between p-4 border-b border-[#263248]">
+                                    <h2 className="text-white font-semibold text-lg">
+                                        Notifications
+                                    </h2>
+
+                                    <button
+                                        onClick={handleReadAll}
+                                        className="text-indigo-400 hover:text-indigo-300 text-sm"
+                                    >
+                                        Mark all read
+                                    </button>
+                                </div>
+
+                                <div className="max-h-96 overflow-y-auto">
+
+                                    {notifications.length === 0 ? (
+                                        <div className="p-6 text-center text-gray-400">
+                                            No notifications
+                                        </div>
+                                    ) : (
+                                        notifications.map((notification) => (
+
+                                        <div
+                                            key={notification.id}
+                                            onClick={() => handleRead(notification.id)}
+                                            className={`p-4 border-b border-[#263248] cursor-pointer hover:bg-[#1f2a3d]
+                                            ${!notification.is_read ? "bg-[#1A2233]" : ""}`}
+                                        >
+
+                                            <div className="flex justify-between items-start">
+
+                                                    <div>
+
+                                                        <h3 className="text-white font-semibold">
+                                                            {notification.title}
+                                                        </h3>
+
+                                                        <p className="text-gray-300 text-sm mt-1">
+                                                            {notification.message}
+                                                        </p>
+
+                                                        <span className="text-xs text-gray-500 mt-2 block">
+                                                            Just now
+                                                        </span>
+
+                                                    </div>
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(notification.id);
+                                                        }}
+                                                        className="text-red-400 hover:text-red-300"
+                                                    >
+                                                        🗑
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+                                        ))
+                                    )}
+
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
                 <img src={profile} alt="" className="w-14 h-13 pr-2" />
                 <span className="pr-8 font-bold">
                     {name}
