@@ -8,7 +8,6 @@ from .services import generate_response
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .prompts.prompt_builder import build_prompt
-from .prompts.context import get_relevant_tasks
 from .actions.parser import parse_ai_response
 from .actions.validator import validate_action
 from .actions.executor import execute_action
@@ -64,15 +63,15 @@ class SendMessageView(APIView):
 
         user_message = request.data.get("message")
 
-        if chat.title == "New Chat":
-            chat.title = user_message[:30]
-            chat.save()
-
         if not user_message:
             return Response(
-                {"error": "Message is required"},
+                {"error": "Message is required."},
                 status=400
             )
+
+        if chat.title == "New Chat":
+            chat.title = user_message[:30]
+            chat.save(update_fields=["title"])
 
         ChatMessage.objects.create(
             chat=chat,
@@ -87,9 +86,9 @@ class SendMessageView(APIView):
                 user_message
             )
 
-            response = generate_response(prompt)
+            response_text = generate_response(prompt)
 
-            parsed = parse_ai_response(response)
+            parsed = parse_ai_response(response_text)
 
             valid, error = validate_action(parsed)
 
@@ -99,16 +98,19 @@ class SendMessageView(APIView):
                     status=400
                 )
 
-            result = execute_action(
-                request.user,
-                parsed
-            )
+            action_result = None
 
-            if not result["success"]:
-                return Response(
-                    {"error": result["message"]},
-                    status=400
+            if parsed["intent"] != "none":
+                action_result = execute_action(
+                    request.user,
+                    parsed
                 )
+
+                if not action_result["success"]:
+                    return Response(
+                        {"error": action_result["message"]},
+                        status=400
+                    )
 
             ChatMessage.objects.create(
                 chat=chat,
@@ -117,14 +119,23 @@ class SendMessageView(APIView):
             )
 
             return Response({
-                "reply": parsed["reply"]
+                "reply": parsed["reply"],
+                "intent": parsed["intent"],
+                "reason": parsed.get("reason", ""),
+                "action": action_result
             })
 
-        except Exception:
+        except Exception as e:
             return Response(
-                {"error": "AI service temporarily unavailable"},
-                status=503
+                {"error": str(e)},
+                status=500
             )
+
+        # except Exception:
+            # return Response(
+            # {"error": "AI service temporarily unavailable."},
+            # status=503
+            # )
 
 
 class GeminiTestView(APIView):
