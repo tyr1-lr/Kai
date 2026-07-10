@@ -19,7 +19,7 @@ def get_relevant_tasks(user, user_message):
 
 
 def get_task_context(tasks):
-    if not tasks.exists():
+    if not tasks:
         return "Current Tasks:\nNo active tasks.\n"
 
     task_context = "Current Tasks:\n\n"
@@ -59,9 +59,8 @@ def get_relevant_notes(user, user_message):
 
 def get_note_context(notes):
 
-    if not notes.exists():
+    if not notes:
         return "Current Notes:\nNo notes at this time.\n"
-
     note_context = "Current Notes:\n"
 
     for note in notes:
@@ -94,8 +93,8 @@ def get_relevant_goals(user, user_message):
 
 def get_goal_context(goals):
 
-    if not goals.exists():
-        return "Current Goals: \nNo goals at the moment.\n"
+    if not goals:
+        return "Current Goals:\nNo goals at the moment.\n"
 
     goal_context = "Current Goals:\n\n"
 
@@ -147,7 +146,7 @@ def get_relevant_events(user, user_message):
 
 def get_event_context(events):
 
-    if not events.exists():
+    if not events:
         return "Current Events:\nNo events at the moment.\n"
 
     event_context = "Current Events:\n\n"
@@ -193,8 +192,8 @@ def get_relevant_reminders(user, user_message):
 
 def get_reminder_context(reminders):
 
-    if not reminders.exists():
-        return "Current Reminders: \nNo reminders at the moment.\n"
+    if not reminders:
+        return "Current Reminders:\nNo reminders at the moment.\n"
 
     reminder_context = "Current Reminders:\n\n"
 

@@ -22,7 +22,7 @@ def create_note(user, data):
     note = Note.objects.create(
         author=user,
         title=data["title"],
-        content=data.get("content", "")
+        content=data.get("content") or "",
     )
 
     return {

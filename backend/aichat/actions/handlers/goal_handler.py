@@ -21,7 +21,7 @@ def create_goal(user, data):
     goal = Goal.objects.create(
         author=user,
         title=data["title"],
-        description=data.get("description", ""),
+        description=data.get("description") or "",
         target_date=data.get("target_date"),
         category=data.get("category", "LEARNING"),
         priority=data.get("priority", "MEDIUM")

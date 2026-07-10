@@ -22,7 +22,7 @@ def create_task(user, data):
     task = Task.objects.create(
         author=user,
         title=data["title"],
-        description=data.get("description", ""),
+        description=data.get("description") or "",
         priority=data.get("priority", "MEDIUM"),
         due_date=data.get("due_date"),
     )

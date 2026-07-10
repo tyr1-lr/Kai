@@ -22,7 +22,7 @@ def create_reminder(user, data):
     reminder = Reminder.objects.create(
         author=user,
         title=data["title"],
-        description=data.get("description", ""),
+        description=data.get("description") or "",
         date=data.get("date"),
         time=data.get("time"),
         repeat=data.get("repeat", "NEVER"),

@@ -24,7 +24,7 @@ def create_event(user, data):
         date=data.get("date"),
         start_time=data.get("start_time"),
         end_time=data.get("end_time"),
-        description=data.get("description", ""),
+        description=data.get("description") or "",
         is_reminder=data.get("is_reminder", False),
         reminder_time=data.get("reminder_time"),
     )
