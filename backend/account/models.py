@@ -31,3 +31,15 @@ class Users(AbstractUser):
     REQUIRED_FIELDS = ["username"]
 
     objects = UserManager()
+
+
+class PasswordResetCode(models.Model):
+    author = models.ForeignKey(
+        Users,
+        on_delete=models.CASCADE,
+        related_name="password_reset_codes",
+    )
+
+    code = models.CharField(max_length=6)
+
+    created_at = models.DateTimeField(auto_now_add=True)
