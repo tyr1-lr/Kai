@@ -1,54 +1,19 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import bgAuth from "../assets/bgauth.png";
 import logo from "../assets/logo.png";
-import api from "../api";
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 
-function Register({ route }) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await api.post(route, {
-        username,
-        email,
-        password,
-      });
-
-      navigate("/login");
-    } catch (error) {
-      alert(error.response?.data?.detail || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   return (
-    <div
-      className="min-h-full bg-[#010110] flex items-center justify-center px-6 py-10"
-      style={{
-        fontFamily: "'Manrope', sans-serif",
-        fontWeight: 700,
-      }}
-    >
+    <div className="min-h-full bg-[#010110] flex items-center justify-center px-6 py-10">
       <div
         style={{ backgroundImage: `url(${bgAuth})` }}
         className="w-full max-w-4xl rounded-2xl border border-white/20 bg-cover bg-center p-8 sm:p-10 lg:p-14 shadow-2xl"
@@ -64,50 +29,41 @@ function Register({ route }) {
 
           <div className="mt-4 text-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
-              Create Account
+              Reset Password
             </h1>
 
-            <p className="mt-2 text-white/70">
-              Join Kai and start your productivity journey.
+            <p className="mt-2 max-w-md text-white/70">
+              Enter the verification code we sent to your email, then choose a
+              new password.
             </p>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-lg mt-8 space-y-5"
-          >
+          <form className="w-full max-w-lg mt-8 space-y-5">
             <div>
-              <label className="text-white">Username</label>
+              <label className="text-white">Verification Code</label>
 
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="yourname"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="123456"
                 className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
               />
+
+              <button
+                type="button"
+                className="mt-2 text-sm text-violet-400 hover:text-violet-300"
+              >
+                Resend Code
+              </button>
             </div>
 
             <div>
-              <label className="text-white">Email</label>
-
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-white">Password</label>
+              <label className="text-white">New Password</label>
 
               <div className="relative mt-2">
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500"
                 />
@@ -115,7 +71,7 @@ function Register({ route }) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -132,8 +88,6 @@ function Register({ route }) {
               <div className="relative mt-2">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500"
                 />
@@ -141,9 +95,9 @@ function Register({ route }) {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
                 >
-                  {showConfirmPassword ? (
+                  {showPassword ? (
                     <EyeOff className="h-5 w-5" />
                   ) : (
                     <Eye className="h-5 w-5" />
@@ -154,19 +108,18 @@ function Register({ route }) {
 
             <button
               type="submit"
-              disabled={loading}
-              className="mt-2 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
+              className="h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800"
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              Reset Password
             </button>
 
             <div className="text-center text-white/70">
-              Already have an account?{" "}
+              Remember your password?{" "}
               <NavLink
                 to="/login"
                 className="text-violet-400 hover:text-violet-300"
               >
-                Login
+                Back to Login
               </NavLink>
             </div>
           </form>
@@ -176,4 +129,4 @@ function Register({ route }) {
   );
 }
 
-export default Register;
+export default ResetPassword;
