@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import bgAuth from "../assets/bgauth.png";
 import logo from "../assets/logo.png";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { Eye, EyeOff } from "lucide-react";
@@ -12,15 +12,28 @@ function Login({ route }) {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
+  const emailRef = useRef(null);
+
+  useEffect(() => {
+    emailRef.current?.focus();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return;
+    setError("");
     setLoading(true);
 
     try {
-      const res = await api.post(route, { email, password });
+      const res = await api.post(route, {
+        email: email.trim(),
+        password,
+      });
 
       if (rememberMe) {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
@@ -32,7 +45,11 @@ function Login({ route }) {
 
       navigate("/dashboard");
     } catch (error) {
-      alert(error.response?.data?.detail || error.message);
+      setError(
+        error.response?.data?.detail ||
+          error.response?.data?.error ||
+          "Invalid email or password.",
+      );
     } finally {
       setLoading(false);
     }
@@ -75,10 +92,13 @@ function Login({ route }) {
 
               <input
                 type="email"
+                ref={emailRef}
+                autoComplete="email"
+                disabled={loading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
+                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
               />
             </div>
 
@@ -87,8 +107,13 @@ function Login({ route }) {
                 <label className="text-white">Password</label>
 
                 <NavLink
-                  to="/forgot-password"
-                  className="text-sm text-violet-400 hover:text-violet-300"
+                  to={loading ? "#" : "/forgot-password"}
+                  onClick={(e) => loading && e.preventDefault()}
+                  className={`text-sm ${
+                    loading
+                      ? "text-gray-500 cursor-not-allowed"
+                      : "text-violet-400 hover:text-violet-300"
+                  }`}
                 >
                   Forgot password?
                 </NavLink>
@@ -98,16 +123,19 @@ function Login({ route }) {
                 <div className="relative mt-2">
                   <input
                     type={showPassword ? "text" : "password"}
+                    disabled={loading}
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500"
+                    className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
                   />
 
                   <button
                     type="button"
+                    disabled={loading}
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -122,6 +150,7 @@ function Login({ route }) {
             <div className="flex items-center gap-2 mt-2">
               <input
                 type="checkbox"
+                disabled={loading}
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
@@ -136,19 +165,37 @@ function Login({ route }) {
               </label>
             </div>
 
+            {error && (
+              <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
               className="mt-6 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Logging in...</span>
+                </div>
+              ) : (
+                "Login"
+              )}
             </button>
 
             <div className="mt-5 text-center text-white/70">
               Don't have an account?{" "}
               <NavLink
-                to="/register"
-                className="text-violet-400 hover:text-violet-300"
+                to={loading ? "#" : "/register"}
+                onClick={(e) => loading && e.preventDefault()}
+                className={`${
+                  loading
+                    ? "text-gray-500 cursor-not-allowed"
+                    : "text-violet-400 hover:text-violet-300"
+                }`}
               >
                 Register
               </NavLink>

@@ -2,10 +2,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import bgAuth from "../assets/bgauth.png";
 import logo from "../assets/logo.png";
 import api from "../api";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
 function Register({ route }) {
+  const [error, setError] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,11 +17,26 @@ function Register({ route }) {
 
   const navigate = useNavigate();
 
+  const usernameRef = useRef(null);
+
+  useEffect(() => {
+    usernameRef.current?.focus();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (loading) return;
+
+    setError("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -28,14 +44,18 @@ function Register({ route }) {
 
     try {
       await api.post(route, {
-        username,
-        email,
+        username: username.trim(),
+        email: email.trim(),
         password,
       });
 
       navigate("/login");
     } catch (error) {
-      alert(error.response?.data?.detail || error.message);
+      setError(
+        error.response?.data?.detail ||
+          error.response?.data?.error ||
+          "Unable to create account.",
+      );
     } finally {
       setLoading(false);
     }
@@ -81,10 +101,13 @@ function Register({ route }) {
 
               <input
                 type="text"
+                disabled={loading}
+                ref={usernameRef}
                 value={username}
+                autoComplete="username"
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="yourname"
-                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
+                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
               />
             </div>
 
@@ -93,10 +116,12 @@ function Register({ route }) {
 
               <input
                 type="email"
+                disabled={loading}
                 value={email}
+                autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
+                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
               />
             </div>
 
@@ -107,15 +132,18 @@ function Register({ route }) {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
+                  disabled={loading}
+                  autoComplete="new-password"
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500"
+                  className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
                 />
 
                 <button
                   type="button"
+                  disabled={loading}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -124,6 +152,10 @@ function Register({ route }) {
                   )}
                 </button>
               </div>
+
+              <p className="mt-2 text-xs text-white/60">
+                Password must be at least 8 characters long.
+              </p>
             </div>
 
             <div>
@@ -133,15 +165,18 @@ function Register({ route }) {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
+                  disabled={loading}
+                  autoComplete="new-password"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500"
+                  className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
                 />
 
                 <button
                   type="button"
+                  disabled={loading}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -152,19 +187,37 @@ function Register({ route }) {
               </div>
             </div>
 
+            {error && (
+              <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
               className="mt-2 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Creating Account...</span>
+                </div>
+              ) : (
+                "Create Account"
+              )}
             </button>
 
             <div className="text-center text-white/70">
               Already have an account?{" "}
               <NavLink
-                to="/login"
-                className="text-violet-400 hover:text-violet-300"
+                to={loading ? "#" : "/login"}
+                onClick={(e) => loading && e.preventDefault()}
+                className={`${
+                  loading
+                    ? "text-gray-500 cursor-not-allowed"
+                    : "text-violet-400 hover:text-violet-300"
+                }`}
               >
                 Login
               </NavLink>

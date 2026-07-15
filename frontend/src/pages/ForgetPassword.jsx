@@ -1,6 +1,6 @@
 import bgAuth from "../assets/bgauth.png";
 import logo from "../assets/logo.png";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import api from "../api";
 
@@ -12,8 +12,16 @@ function ForgetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const emailRef = useRef(null);
+
+  useEffect(() => {
+    emailRef.current?.focus();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return;
 
     if (!email.trim()) {
       setError("Email is required.");
@@ -26,16 +34,19 @@ function ForgetPassword() {
 
     try {
       await api.post("api/forgot-password/", {
-        email,
+        email: email.trim(),
       });
 
       setSuccess("Verification code sent.");
 
+      const resendUntil = Date.now() + 60000;
+
+      localStorage.setItem("resetEmail", email.trim());
+      localStorage.setItem("resetCountdown", resendUntil);
+
       setTimeout(() => {
-        navigate("/reset-password", {
-          state: { email },
-        });
-      }, 1000);
+        navigate("/reset-password");
+      }, 500);
     } catch (err) {
       console.error(err);
 
@@ -85,29 +96,52 @@ function ForgetPassword() {
               <input
                 type="email"
                 value={email}
+                ref={emailRef}
+                autoComplete="email"
+                disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500"
+                className="mt-2 w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
               />
             </div>
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
 
-            {success && <p className="text-green-400 text-sm">{success}</p>}
+            {success && (
+              <div className="rounded-lg border border-green-500/40 bg-green-500/10 px-4 py-3 text-sm text-green-300">
+                {success}
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
               className="h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
             >
-              {loading ? "Sending..." : "Send Verification Code"}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Sending verification code...</span>
+                </div>
+              ) : (
+                "Send Verification Code"
+              )}
             </button>
 
             <div className="text-center text-white/70">
               Remember your password?{" "}
               <NavLink
-                to="/login"
-                className="text-violet-400 hover:text-violet-300"
+                to={loading ? "#" : "/login"}
+                onClick={(e) => loading && e.preventDefault()}
+                className={`${
+                  loading
+                    ? "text-gray-500 cursor-not-allowed"
+                    : "text-violet-400 hover:text-violet-300"
+                }`}
               >
                 Back to Login
               </NavLink>
