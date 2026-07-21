@@ -15,6 +15,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+        ]
+
+
 class ForgetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

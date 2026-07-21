@@ -1,17 +1,13 @@
+import Sidebar from "../components/Sidebar.jsx";
 
-import Sidebar from "../components/Sidebar.jsx"
+function DashboardLayout({ children }) {
+  return (
+    <div className="flex h-screen">
+      <Sidebar />
 
-function DashboardLayout ({ children }){
-    return(
-        <div className="h-screen flex">
-            <aside>
-                <Sidebar />
-            </aside>
-            <main className="flex-1 relative w-full bg-[#0D1020]">
-                {children}
-            </main>
-        </div>
-    );
-};
+      <main className="flex-1 bg-[#0D1020] overflow-y-auto">{children}</main>
+    </div>
+  );
+}
 
 export default DashboardLayout;

@@ -1,4 +1,4 @@
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import generics, permissions, status
 from django.contrib.auth import get_user_model
 from .serializers import (
@@ -6,6 +6,7 @@ from .serializers import (
     ForgetPasswordSerializer,
     VerifyResetCodeSerializer,
     ResetPasswordSerializer,
+    CurrentUserSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -26,6 +27,14 @@ class RegisterView(generics.CreateAPIView):
 
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class CurrentUserView(generics.RetrieveAPIView):
+    serializer_class = CurrentUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
 class ForgetPasswordView(APIView):
