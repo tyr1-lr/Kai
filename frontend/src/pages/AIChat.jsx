@@ -7,6 +7,7 @@ function AIChat() {
   const [messages, setMessages] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [input, setInput] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const getChats = async () => {
@@ -83,6 +84,8 @@ function AIChat() {
     const messages = await getMessages(chatId);
 
     setMessages(messages);
+
+    setShowHistory(false);
   };
 
   const handleCreateChat = async () => {
@@ -107,7 +110,20 @@ function AIChat() {
   };
 
   const handleSendMessage = async () => {
-    if (!input.trim() || !activeChatId) return;
+    if (!input.trim()) return;
+
+    let chatId = activeChatId;
+
+    if (!chatId) {
+      const newChat = await createChat();
+
+      chatId = newChat.id;
+
+      setActiveChatId(chatId);
+
+      const updatedChats = await getChats();
+      setChats(updatedChats);
+    }
 
     const userMessage = {
       id: Date.now(),
@@ -122,9 +138,11 @@ function AIChat() {
 
     setLoading(true);
 
-    await sendMessage(text);
+    await api.post(`api/chats/${chatId}/send/`, {
+      message: text,
+    });
 
-    const updatedMessages = await getMessages(activeChatId);
+    const updatedMessages = await getMessages(chatId);
 
     setMessages(updatedMessages);
 
@@ -135,18 +153,18 @@ function AIChat() {
   console.log("Messages:", messages);
 
   return (
-    <div className="h-screen flex flex-col w-[1311px]">
-      <div className="min-h-[80px] w-full flex px-4">
-        <img src={logo} alt="Logo" className="h-20 w-20" />
-        <div className="mt-4">
-          <h1 className="text-white text-xl flex flex-row gap-4">
+    <div className="h-full w-full flex flex-col overflow-hidden">
+      <div className="h-16 sm:h-20 flex items-center px-3 sm:px-6">
+        <img src={logo} alt="Logo" className="h-10 w-10 sm:h-16 sm:w-16" />
+        <div>
+          <h1 className="text-white text-base sm:text-xl flex items-center gap-2">
             Kai AI
-            <div className="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full w-fit">
+            <div className="text-green-400 text-[11px] md:text-xs mt-1 flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-              <span className="text-sm">Online</span>
+              <span className="text-xs sm:text-sm">Online</span>
             </div>
           </h1>
-          <p className="text-white flex flex-row text-xs mt-2 gap-2">
+          <p className="text-white flex items-center text-[10px] sm:text-xs gap-1 mt-1">
             Powered by Gemini 2.5 Flash
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -167,130 +185,124 @@ function AIChat() {
             </svg>
           </p>
         </div>
+
+        <button
+          onClick={() => setShowHistory(true)}
+          className="ml-auto flex items-center gap-2 text-white hover:text-indigo-400"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-menu-icon lucide-menu"
+          >
+            <path d="M4 5h16" />
+            <path d="M4 12h16" />
+            <path d="M4 19h16" />
+          </svg>{" "}
+        </button>
       </div>
-      <div className="flex flex-row flex-1 min-h-0">
-        <div className="border border-[#2A3145] w-130 px-4 flex flex-col min-h-0">
-          <div className="h-14 w-full mt-2 flex flex-col justify-center items-center">
-            <button
-              onClick={handleCreateChat}
-              className="h-12 w-80 flex flex-row justify-center items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="M12 5v14" />
-              </svg>
-
-              <span>New Chat</span>
-            </button>
-          </div>
-
-          <h2 className="text-white mt-4 text-lg">Recent Conversation</h2>
-
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 border-t border-[#2A3145]">
-            <ul className="gap-2 overflow-y-auto">
-              {chats.map((chat) => (
-                <li
-                  key={chat.id}
-                  onClick={() => handleSelectChat(chat.id)}
-                  className="w-full mt-2 h-22 flex flex-row px-5 items-center bg-[#121726] hover:bg-[#1f2a3d] rounded-md cursor-pointer"
-                >
-                  <button className="flex flex-col w-full text-left">
-                    <h3 className="text-white">{chat.title}</h3>
-                    <p className="text-xs text-gray-400">Chat ID: {chat.id}</p>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+      <div className="flex flex-1 min-h-0 relative">
         <div className="border border-[#2A3145] w-full flex flex-col min-h-0">
-          <div className="h-[520px] border overflow-y-auto border-t px-4 pt-4 border-[#2A3145]">
+          <div className="flex-1 overflow-y-auto border-t border-[#2A3145] px-4 pt-4">
             {!activeChatId ? (
-              <div className="h-full flex flex-col items-center justify-center text-center text-white">
-                <div className="text-5xl flex flex-row px-2 items-center">
-                  <img src={logo} alt="Logo" className="h-24 w-24" />
+              <div className="min-h-full flex flex-col items-center justify-center text-center text-white px-4 py-6">
+                <div className="flex items-center gap-2 text-2xl sm:text-4xl">
+                  <img
+                    src={logo}
+                    alt="Logo"
+                    className="h-12 w-12 sm:h-20 sm:w-20"
+                  />
                   <h1>Kai</h1>
                 </div>
 
-                <p className="text-sm text-gray-400 flex flex-row items-center justify-center">
-                  Select a chat or start a new conversation.
+                <p className="text-sm sm:text-base text-gray-400 max-w-md px-4 leading-8">
+                  Kai can help you stay organized by creating tasks, notes,
+                  goals, reminders, and calendar events—all through natural
+                  language.
                 </p>
 
                 <div className="mt-6 flex flex-col gap-2 text-sm text-gray-400">
-                  <p>Try asking something like:</p>
+                  <p>Try asking Kai to help with your workspace:</p>
 
-                  <div className="grid grid-cols-3 gap-4 w-[750px] mt-2">
+                  <div className="grid w-full max-w-4xl grid-cols-1 md:grid-cols-3 gap-3 mt-4 px-2">
                     <button
-                      onClick={() => setInput("Explain React useState")}
-                      className="hover:text-white transition bg-[#1A1F36] h-20 cursor-pointer rounded-md flex flex-row justify-center items-center gap-2"
+                      onClick={() =>
+                        setInput(
+                          "Create a high priority task to finish my Django project by Friday.",
+                        )
+                      }
+                      className="hover:text-white transition bg-[#1A1F36] min-h-[90px] p-4 rounded-lg flex items-center gap-3 text-left"
                     >
-                      <div className="text-yellow-400 bg-[#44381F] rounded-md h-10 w-10 flex flex-row items-center justify-center">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#44381F] text-yellow-400">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
+                          width="22"
+                          height="22"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className=""
                         >
-                          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-                          <path d="M9 18h6" />
-                          <path d="M10 22h4" />
+                          <path d="M9 11l3 3L22 4" />
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                         </svg>
                       </div>
-                      <p className="text-white text-base">
-                        Give me 5 app ideas
+
+                      <p className="text-white text-sm sm:text-base leading-tight">
+                        Create a Task
                       </p>
                     </button>
+
                     <button
-                      onClick={() => setInput("Explain React state")}
-                      className="hover:text-white transition bg-[#1A1F36] cursor-pointer h-20 rounded-md flex flex-row justify-center items-center gap-2"
+                      onClick={() =>
+                        setInput(
+                          "Create a note titled 'React Hooks' and summarize useState and useEffect.",
+                        )
+                      }
+                      className="hover:text-white transition bg-[#1A1F36] rounded-xl flex items-center gap-4 p-5 text-left"
                     >
-                      <div className="text-green-400 bg-[#1F3A24] rounded-md h-10 w-10 flex flex-row items-center justify-center">
+                      <div className="text-green-400 bg-[#1F3A24] rounded-md h-10 w-10 flex items-center justify-center">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
+                          width="22"
+                          height="22"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="lucide lucide-code-xml-icon lucide-code-xml"
                         >
-                          <path d="m18 16 4-4-4-4" />
-                          <path d="m6 8-4 4 4 4" />
-                          <path d="m14.5 4-5 16" />
+                          <path d="M12 20h9" />
+                          <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z" />
                         </svg>
                       </div>
-                      <p className="text-white text-base">
-                        Explain React state
-                      </p>
+
+                      <p className="text-white text-base">Take a Note</p>
                     </button>
+
                     <button
-                      onClick={() => setInput("Help debug my code")}
-                      className="hover:text-white transition bg-[#1A1F36] cursor-pointer h-20 rounded-md flex flex-row justify-center items-center gap-2"
+                      onClick={() =>
+                        setInput(
+                          "Help me create a goal to become a Django backend developer.",
+                        )
+                      }
+                      className="hover:text-white transition bg-[#1A1F36] rounded-xl flex items-center gap-4 p-5 text-left"
                     >
-                      <div className="text-red-400 bg-[#3A1B1B] rounded-md h-10 w-10 flex flex-row items-center justify-center">
+                      <div className="text-red-400 bg-[#3A1B1B] rounded-md h-10 w-10 flex items-center justify-center">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
+                          width="22"
+                          height="22"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -298,20 +310,14 @@ function AIChat() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="M12 20v-9" />
-                          <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
-                          <path d="M14.12 3.88 16 2" />
-                          <path d="M21 21a4 4 0 0 0-3.81-4" />
-                          <path d="M21 5a4 4 0 0 1-3.55 3.97" />
-                          <path d="M22 13h-4" />
-                          <path d="M3 21a4 4 0 0 1 3.81-4" />
-                          <path d="M3 5a4 4 0 0 0 3.55 3.97" />
-                          <path d="M6 13H2" />
-                          <path d="m8 2 1.88 1.88" />
-                          <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+                          <circle cx="12" cy="12" r="9" />
+                          <circle cx="12" cy="12" r="3" />
                         </svg>
                       </div>
-                      <p className="text-white text-base">Help debug my code</p>
+
+                      <p className="text-white text-sm sm:text-base text-white">
+                        Plan a Goal
+                      </p>
                     </button>
                   </div>
                 </div>
@@ -346,7 +352,7 @@ function AIChat() {
                   )}
 
                   <div
-                    className={`max-w-[70%] px-4 py-3 rounded-2xl ${
+                    className={`max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-2xl ${
                       msg.role === "user"
                         ? "bg-indigo-600 text-white"
                         : "bg-[#151A2D] text-white"
@@ -361,12 +367,14 @@ function AIChat() {
               <div className="flex justify-start mb-4">
                 <img src={logo} className="w-12 h-12 mt-1 rounded-full mr-2" />
 
-                <div className="animate-pulse">Kai is thinking...</div>
+                <div className="animate-pulse text-white">
+                  Kai is thinking...
+                </div>
               </div>
             )}
           </div>
           <div className="flex flex-col">
-            <div className="p-3 border-t border-gray-700 flex-row items-center flex gap-2">
+            <div className="flex items-center gap-2 border-t border-gray-700 px-3 py-2">
               <button className="text-white cursor-pointer hover:text-[#2A3145]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -387,18 +395,18 @@ function AIChat() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="flex-1 p-2 rounded bg-[#151A2D] text-white"
+                className="flex-1 rounded-lg bg-[#151A2D] px-3 py-2 text-sm text-white placeholder:text-gray-500"
                 placeholder="Message Kai..."
               />
 
               <button
                 onClick={handleSendMessage}
-                className="text-white h-8 px-4 bg-blue-700 rounded cursor-pointer hover:bg-[#1f2a3d]"
+                className="h-10 px-4 rounded-lg bg-indigo-700 text-white hover:bg-indigo-600 shrink-0"
               >
                 Send
               </button>
             </div>
-            <div className="text-white text-xs flex flex-row items-center justify-center">
+            <div className="px-4 py-2 text-center text-[11px] sm:text-xs text-gray-400">
               <p>
                 Kai can make mistakes. Consider checking important information
               </p>
@@ -406,6 +414,88 @@ function AIChat() {
           </div>
         </div>
       </div>
+      {showHistory && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => setShowHistory(false)}
+          />
+
+          <div className="fixed right-0 top-0 h-full w-full sm:w-96 bg-[#121726] border-l border-[#2A3145] z-50 flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-[#2A3145]">
+              <h2 className="text-xl font-semibold text-white">Chats</h2>
+
+              <button
+                onClick={() => setShowHistory(false)}
+                className="text-white hover:text-red-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-4">
+              <button
+                onClick={handleCreateChat}
+                className="w-full h-12 rounded-md bg-indigo-700 hover:bg-indigo-600 text-white flex items-center justify-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
+                New Chat
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                Recent Conversations
+              </h3>
+
+              <div className="space-y-2">
+                {chats.map((chat) => (
+                  <button
+                    key={chat.id}
+                    onClick={() => handleSelectChat(chat.id)}
+                    className={`w-full text-left p-4 rounded-lg transition ${
+                      activeChatId === chat.id
+                        ? "bg-indigo-700"
+                        : "bg-[#1A1F36] hover:bg-[#232A45]"
+                    }`}
+                  >
+                    <h4 className="text-white truncate">{chat.title}</h4>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Chat ID: {chat.id}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
