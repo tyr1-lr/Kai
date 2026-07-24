@@ -381,13 +381,13 @@ function Calendar() {
   };
 
   return (
-    <div className="p-4 bg-[#0D1020] h-[695px] w-[1305px] text-white">
+    <div className="w-full h-full min-h-screen bg-[#0D1020] text-white p-3 md:p-4 lg:p-6 overflow-auto">
       <div className="text-3xl font-bold mb-2">
         <h1 className="">Calendar</h1>
       </div>
 
-      <div className="flex flex-row h-[30px] items-center">
-        <div className="w-300 flex flex-row h-[10px] text-base items-center justify-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+        <div className="flex items-center justify-center gap-2 lg:flex-1 text-sm md:text-base">
           <button
             onClick={prevMonth}
             className="cursor-pointer hover:text-[#2A3145]"
@@ -430,7 +430,7 @@ function Calendar() {
         <div className=" flex flex-row ml-auto">
           <button
             onClick={() => setIsEventModalOpen(true)}
-            className="h-12 w-36 mr-10 flex ml-auto items-center rounded-md text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]"
+            className="ml-auto flex h-10 md:h-11 items-center gap-2 rounded-md bg-indigo-700 px-3 md:px-5 text-xs sm:text-sm text-white cursor-pointer hover:bg-[#1f2a3d]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -452,9 +452,9 @@ function Calendar() {
         </div>
       </div>
 
-      <div className="flex flex-row mt-4 h-[575px] w-[910px] px-2 gap-2">
-        <div className="flex flex-col gap-4 w-[895px] shrink-0">
-          <div className="w-[895px] h-[590px] border border-white/10 rounded-md">
+      <div className="flex flex-col xl:flex-row mt-4 gap-4 w-full">
+        <div className="flex flex-col gap-4 flex-1 min-w-0">
+          <div className="w-full min-h-[600px] border border-white/10 rounded-md overflow-x-auto">
             <div className="grid grid-cols-7 border-t bg-[#121726] border-white/10">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                 <div
@@ -482,7 +482,7 @@ function Calendar() {
                   <div
                     key={idx}
                     onClick={() => day && selectDay(day)}
-                    className={`h-[70px] border p-2 text-sm font-bold text-white cursor-pointer transition
+                    className={`h-[70px] md:h-[90px] xl:h-[100px] border p-2 text-sm font-bold text-white cursor-pointer transition
                                         ${
                                           isSelected
                                             ? "bg-blue-500/30 border-blue-400"
@@ -494,37 +494,43 @@ function Calendar() {
                       <>
                         <div className="text-gray-400">{day}</div>
 
-                        <div className="mt-1 space-y-1">
-                          {getEventsForDay(day).map((event) => (
-                            <div
-                              key={`event-${event.id}`}
-                              className={`flex flex-col px-2 rounded-md text-xs truncate ${eventColors[event.color]}`}
-                            >
-                              <span>
-                                {event.title.length > 10
-                                  ? event.title.slice(0, 10) + "..."
-                                  : event.title}
-                              </span>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {getEventsForDay(day)
+                            .slice(0, 4)
+                            .map((event) => (
+                              <div
+                                key={`event-${event.id}`}
+                                className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ${
+                                  event.color === "purple"
+                                    ? "bg-purple-400"
+                                    : event.color === "blue"
+                                      ? "bg-blue-400"
+                                      : event.color === "green"
+                                        ? "bg-green-400"
+                                        : "bg-orange-400"
+                                }`}
+                              />
+                            ))}
 
-                              <span>
-                                {event.start_time} - {event.end_time}
-                              </span>
-                            </div>
-                          ))}
+                          {getRemindersForDay(day)
+                            .slice(0, 4)
+                            .map((reminder) => (
+                              <div
+                                key={`reminder-${reminder.id}`}
+                                className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-yellow-400"
+                              />
+                            ))}
 
-                          {getRemindersForDay(day).map((reminder) => (
-                            <div
-                              key={`reminder-${reminder.id}`}
-                              className="flex items-center gap-1 px-2 rounded-md bg-blue-500/20 text-blue-300 text-xs truncate"
-                            >
-                              🔔
-                              <span>
-                                {reminder.title.length > 10
-                                  ? reminder.title.slice(0, 10) + "..."
-                                  : reminder.title}
-                              </span>
-                            </div>
-                          ))}
+                          {getEventsForDay(day).length +
+                            getRemindersForDay(day).length >
+                            4 && (
+                            <span className="text-[9px] md:text-[10px] text-gray-400">
+                              +
+                              {getEventsForDay(day).length +
+                                getRemindersForDay(day).length -
+                                4}
+                            </span>
+                          )}
                         </div>
                       </>
                     )}
@@ -534,14 +540,15 @@ function Calendar() {
             </div>
           </div>
 
-          <div className="w-[895px] h-[125px] border bg-[#121726] border-white/10 rounded-md">
+          <div className="w-full border bg-[#121726] border-white/10 rounded-md p-4">
             <h1 className="mt-1 px-2">Quick Actions</h1>
             <div className="grid grid-cols-2 h-8 gap-4 px-4 mt-2">
               <button
                 onClick={() => setIsEventModalOpen(true)}
-                className="h-8 justify-center w-full flex items-center rounded-md text-white bg-[#121726] gap-2 cursor-pointer hover:bg-[#1f2a3d] border border-white/10"
+                className="flex h-9 w-full items-center justify-center gap-1 rounded-md border border-white/10 bg-[#121726] text-xs sm:text-sm text-white cursor-pointer hover:bg-[#1f2a3d]"
               >
                 <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -556,13 +563,14 @@ function Calendar() {
                   <path d="M12 5v14" />
                 </svg>
 
-                <span>Add Event</span>
+                <span className="text-xs sm:text-sm">Add Event</span>
               </button>
               <button
                 onClick={() => setIsReminderModalOpen(true)}
-                className="h-8 justify-center w-full flex items-center rounded-md text-white bg-[#121726] gap-2 cursor-pointer hover:bg-[#1f2a3d] border border-white/10"
+                className="flex h-9 w-full items-center justify-center gap-1 rounded-md border border-white/10 bg-[#121726] text-xs sm:text-sm text-white cursor-pointer hover:bg-[#1f2a3d]"
               >
                 <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -577,13 +585,13 @@ function Calendar() {
                   <path d="M12 5v14" />
                 </svg>
 
-                <span>Add Reminder</span>
+                <span className="text-xs sm:text-sm">Add Reminder</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="w-[500px] h-[570px] flex flex-col items-center bg-[#121726] rounded-md border border-white/10 ">
+        <div className="w-full xl:w-[360px] xl:min-w-[360px] h-auto xl:h-[570px] flex flex-col items-center bg-[#121726] rounded-md border border-white/10">
           <div className="flex flex-row text-xs items-center mt-3 justify-center gap-2">
             <button
               onClick={prevMiniMonth}
@@ -623,7 +631,7 @@ function Calendar() {
               </svg>
             </button>
           </div>
-          <div className="grid grid-cols-7 mt-3 h-60 px-4 w-90 border-b border-white/10">
+          <div className="grid grid-cols-7 mt-3 h-60 px-4 w-full border-b border-white/10">
             {["S", "M", "T", "W", "T", "F", "S"].map((miniDay) => (
               <div
                 key={miniDay}
@@ -665,7 +673,7 @@ function Calendar() {
             })}
           </div>
 
-          <div className="mb-4 px-2 mt-2 w-[355px] ">
+          <div className="mb-4 px-4 mt-2 w-full">
             <div className="flex flex-col mb-1">
               <h1 className="text-base font-bold">Events</h1>
               <span className="text-sm">
@@ -738,15 +746,34 @@ function Calendar() {
       </div>
 
       {isEventDetailsOpen && selectedEvent && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#121726] rounded-lg w-[500px] p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#121726] w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg p-4 sm:p-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-xl font-bold">Event Details</h1>
+              <h1 className="text-lg sm:text-xl font-bold">Event Details</h1>
 
-              <button onClick={() => setIsEventDetailsOpen(false)}>✕</button>
+              <button
+                onClick={() => setIsEventDetailsOpen(false)}
+                className="text-xl hover:text-gray-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-x-icon lucide-x"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-5 space-y-3 sm:space-y-4">
               <div>
                 <p className="text-gray-400 text-sm">Title</p>
                 <p>{selectedEvent.title}</p>
@@ -765,22 +792,24 @@ function Calendar() {
               <div>
                 <p className="text-gray-400 text-sm">Category</p>
                 <p>
-                  <p>{selectedEvent.description || "No description."}</p>
+                  <p className="break-words whitespace-pre-wrap">
+                    {selectedEvent.description || "No description."}
+                  </p>
                 </p>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
               <button
                 onClick={() => editEvent(selectedEvent)}
-                className="px-4 py-2 rounded border border-white/10"
+                className="w-full sm:w-auto px-4 py-2 rounded border border-white/10"
               >
                 Edit
               </button>
 
               <button
                 onClick={() => deleteEvent(selectedEvent.id)}
-                className="px-4 py-2 rounded bg-red-600"
+                className="w-full sm:w-auto px-4 py-2 rounded bg-red-600"
               >
                 Delete
               </button>
@@ -791,9 +820,9 @@ function Calendar() {
 
       {isEventModalOpen && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#0D1020] px-6 pt-2 rounded-md w-full h-full flex items-center justify-center">
-            <div className="h-160 w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-3">
-              <div className="flex flex-row items-center px-2 w-full h-15 gap-4">
+          <div className="bg-[#0D1020] px-4 md:px-6 py-4 w-full h-full flex items-center justify-center">
+            <div className="w-full max-w-4xl max-h-[95vh] overflow-y-auto border border-[#40424C] bg-[#121726] rounded-lg px-4 md:px-6 pt-3 flex flex-col">
+              <div className="flex items-center w-full gap-3 px-2 py-2">
                 <div className="bg-[#2B2146] text-purple-300 rounded-md ml-2 w-10 h-10 items-center justify-center flex">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -858,7 +887,7 @@ function Calendar() {
                 </button>
               </div>
 
-              <div className=" flex flex-col mt-2 px-4 h-full mb-4">
+              <div className="flex flex-col mt-2 px-2 md:px-4 flex-1 pb-4">
                 <div>
                   <h2 className="text-white mt-2">Title</h2>
                   <input
@@ -889,7 +918,7 @@ function Calendar() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 ">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="">
                     <h2 className="text-white ">Start Time</h2>
                     <input
@@ -930,7 +959,7 @@ function Calendar() {
                   </div>
 
                   <textarea
-                    className="flex flex-row justify-center pt-2 items-center bg-[#0D1020] w-180 h-25 px-2 rounded border-2 border-[#40424C] text-white"
+                    className="w-full h-28 md:h-32 pt-2 px-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white resize-none"
                     placeholder="Add more details..."
                     value={eventData.description}
                     onChange={(e) =>
@@ -991,9 +1020,9 @@ function Calendar() {
                     </div>
                   )}
 
-                  <div className="h-13 flex flex-row items-center px-4 mt-4 gap-4 justify-end">
+                  <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 px-4 mt-4">
                     <button
-                      className="mt-1 h-10 w-20 border bg-[#0D1020] cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
+                      className="h-10 w-full sm:w-20 border bg-[#0D1020] mb-4 cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
                       onClick={() => {
                         setEditingEvent(null);
 
@@ -1015,7 +1044,7 @@ function Calendar() {
                     </button>
 
                     <button
-                      className="mt-1 h-10 w-25 rounded-md text-whit bg-indigo-700 cursor-pointer hover:bg-[#1f2a3d]"
+                      className="h-10 w-full sm:w-28 rounded-md text-whit bg-indigo-700 cursor-pointer hover:bg-[#1f2a3d]"
                       onClick={() => {
                         if (editingEvent) {
                           updateEvent();
@@ -1035,9 +1064,9 @@ function Calendar() {
       )}
 
       {isReminderModalOpen && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#0D1020] px-6 pt-6 rounded-md w-full h-full flex items-center justify-center">
-            <div className=" w-200 border border-[#40424C] bg-[#121726] rounded-lg px-6 flex-col flex pt-3">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#0D1020] px-4 md:px-6 py-4 w-full h-full flex items-center justify-center">
+            <div className="w-full max-w-4xl max-h-[95vh] overflow-y-auto border border-[#40424C] bg-[#121726] rounded-lg px-4 md:px-6 pt-3 flex flex-col">
               <div className="flex flex-row items-center px-2 w-full h-15 gap-4 pt-8">
                 <div className="bg-[#1F2B46] text-blue-300 rounded-md ml-2 w-10 h-10 items-center justify-center flex">
                   <svg
@@ -1120,7 +1149,7 @@ function Calendar() {
                   </div>
 
                   <textarea
-                    className="flex flex-row justify-center pt-2 items-center bg-[#0D1020] w-180 h-25 px-2 rounded border-2 border-[#40424C] text-white"
+                    className="w-full h-28 md:h-32 pt-2 px-2 rounded bg-[#0D1020] border-2 border-[#40424C] text-white resize-none"
                     placeholder="Add more details..."
                     value={reminderData.notes}
                     onChange={(e) =>
@@ -1132,7 +1161,7 @@ function Calendar() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                   <div>
                     <h2 className="text-white">Date</h2>
                     <input
@@ -1185,9 +1214,9 @@ function Calendar() {
                 </div>
 
                 <div className="h-25 mt-5 mb-4 border-t border-white/20">
-                  <div className="h-13 flex flex-row items-center px-4 mt-4 gap-4 justify-end">
+                  <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 px-4 mt-4">
                     <button
-                      className="mt-1 h-10 w-20 border bg-[#0D1020] cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
+                      className="h-10 w-full sm:w-20 border bg-[#0D1020] cursor-pointer hover:text-[#2A3145] text-white rounded border-2 border-[#40424C]"
                       onClick={() => {
                         setEditingReminder(null);
 
@@ -1206,7 +1235,7 @@ function Calendar() {
                     </button>
 
                     <button
-                      className="mt-1 h-10 w-30 rounded-md text-whit bg-blue-700 cursor-pointer hover:bg-[#1f2a3d]"
+                      className="h-10 w-full sm:w-32 rounded-md bg-blue-700 cursor-pointer hover:bg-[#1f2a3d]"
                       onClick={() => {
                         if (editingReminder) {
                           updateReminder();
@@ -1226,15 +1255,15 @@ function Calendar() {
       )}
 
       {isReminderDetailsOpen && selectedReminder && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#121726] rounded-lg w-[500px] p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#121726] w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg p-4 sm:p-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-xl font-bold">Reminder Details</h1>
+              <h1 className="text-lg sm:text-xl font-bold">Reminder Details</h1>
 
               <button onClick={() => setIsReminderDetailsOpen(false)}>✕</button>
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-5 space-y-3 sm:space-y-4">
               <div>
                 <p className="text-gray-400 text-sm">Title</p>
                 <p>{selectedReminder.title}</p>
@@ -1261,17 +1290,17 @@ function Calendar() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
               <button
                 onClick={() => editReminder(selectedReminder)}
-                className="px-4 py-2 rounded border border-white/10"
+                className="w-full sm:w-auto px-4 py-2 rounded border border-white/10"
               >
                 Edit
               </button>
 
               <button
                 onClick={() => deleteReminder(selectedReminder.id)}
-                className="px-4 py-2 rounded bg-red-600"
+                className="w-full sm:w-auto px-4 py-2 rounded bg-red-600"
               >
                 Delete
               </button>
