@@ -7,6 +7,7 @@ from .serializers import (
     VerifyResetCodeSerializer,
     ResetPasswordSerializer,
     CurrentUserSerializer,
+    UpdateProfileSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,7 +17,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
-from django.conf import settings
 
 
 User = get_user_model()
@@ -31,6 +31,14 @@ class RegisterView(generics.CreateAPIView):
 
 class CurrentUserView(generics.RetrieveAPIView):
     serializer_class = CurrentUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class UpdateProfileView(generics.UpdateAPIView):
+    serializer_class = UpdateProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):

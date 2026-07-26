@@ -22,8 +22,32 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "first_name",
-            "last_name",
+            "bio",
+            "occupation",
+            "timezone",
+            "avatar",
+            "created_at",
+            "updated_at",
+        ]
+
+        read_only_fields = [
+            "id",
+            "email",
+            "created_at",
+        ]
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "bio",
+            "occupation",
+            "timezone",
+            "avatar",
         ]
 
 
