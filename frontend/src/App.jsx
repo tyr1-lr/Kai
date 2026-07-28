@@ -8,7 +8,6 @@ import AIChat from "./pages/AIChat";
 import Goals from "./pages/Goals";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import LandingLayout from "./layouts/LandingLayout";
 import Landing from "./pages/Landing";
@@ -179,17 +178,6 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <Profile />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/dashboard/settings"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Settings />
               </DashboardLayout>
             </ProtectedRoute>
           }

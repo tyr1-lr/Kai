@@ -1,8 +1,4 @@
 import { useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
 import api from "../api";
 
 function Calendar() {
@@ -36,7 +32,7 @@ function Calendar() {
       setEvents(response.data.events);
       setReminders(response.data.reminders);
     } catch (error) {
-      console.log(error);
+      console.error(err);
     }
   };
 
@@ -70,7 +66,7 @@ function Calendar() {
       });
       setEnableReminder(false);
     } catch (err) {
-      console.log(err.response?.data);
+      console.error(err);
     }
   };
 
@@ -121,7 +117,7 @@ function Calendar() {
 
       setIsEventModalOpen(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -133,7 +129,7 @@ function Calendar() {
 
       setIsEventDetailsOpen(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -174,7 +170,7 @@ function Calendar() {
 
       setIsReminderModalOpen(false);
     } catch (err) {
-      console.log(err.response?.data);
+      console.error(err);
     }
   };
 
@@ -217,7 +213,7 @@ function Calendar() {
 
       setIsReminderModalOpen(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -229,7 +225,7 @@ function Calendar() {
 
       setIsReminderDetailsOpen(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -245,7 +241,6 @@ function Calendar() {
   };
 
   const today = new Date();
-  const dayOfMonth = today.getDate();
   const todayYear = today.getFullYear();
   const todayMonth = today.getMonth();
   const todayDate = today.getDate();
@@ -262,21 +257,9 @@ function Calendar() {
     month: "long",
   });
 
-  const dayName = currentDate.toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-
   const result = `${monthName} ${year}`;
 
   const miniMonthName = miniDate.toLocaleString("en-US", {
-    month: "long",
-  });
-
-  const todayDayName = today.toLocaleDateString("en-US", {
-    weekday: "long",
-  });
-
-  const todayMonthName = today.toLocaleString("en-US", {
     month: "long",
   });
 
@@ -563,7 +546,7 @@ function Calendar() {
                   <path d="M12 5v14" />
                 </svg>
 
-                <span className="text-xs sm:text-sm">Add Event</span>
+                <span className="text-xs sm:text-sm">Event</span>
               </button>
               <button
                 onClick={() => setIsReminderModalOpen(true)}
@@ -585,7 +568,7 @@ function Calendar() {
                   <path d="M12 5v14" />
                 </svg>
 
-                <span className="text-xs sm:text-sm">Add Reminder</span>
+                <span className="text-xs sm:text-sm">Reminder</span>
               </button>
             </div>
           </div>

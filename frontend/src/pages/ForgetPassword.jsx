@@ -48,8 +48,6 @@ function ForgetPassword() {
         navigate("/reset-password");
       }, 500);
     } catch (err) {
-      console.error(err);
-
       setError(
         err.response?.data?.error ||
           err.response?.data?.message ||

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAsyncError, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../api";
 
 function Notes() {
@@ -23,9 +23,8 @@ function Notes() {
       .then((res) => res.data)
       .then((data) => {
         setNotes(data);
-        console.log(data);
       })
-      .catch((err) => alert(err));
+      .catch(() => alert("Failed to load notes."));
   };
 
   const deleteNote = (id) => {
@@ -36,7 +35,7 @@ function Notes() {
         else alert("Failed to delete note.");
         getNotes();
       })
-      .catch((err) => alert(err));
+      .catch(() => alert("Failed to delete note."));
   };
 
   const createNote = (e) => {
@@ -52,7 +51,7 @@ function Notes() {
         setIsOpen(false);
         getNotes();
       })
-      .catch((err) => alert(err));
+      .catch(() => alert("Failed to create note."));
   };
 
   const editNote = async (e) => {
@@ -67,8 +66,8 @@ function Notes() {
       alert("Note updated!");
       setIsOpen(false);
       getNotes();
-    } catch (err) {
-      alert(err);
+    } catch {
+      alert("Failed to update note.");
     }
   };
 
@@ -148,7 +147,7 @@ function Notes() {
         </button>
       </div>
 
-      <ul className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-16 flex flex-col gap-3">
+      <ul className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-16 h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden flex flex-col gap-3">
         {filteredNotes.length === 0 ? (
           <li className="text-center text-gray-400 py-10">No notes found.</li>
         ) : (
@@ -168,10 +167,10 @@ function Notes() {
             return (
               <li
                 key={note.id}
-                className="w-full min-h-[100px] p-5 bg-[#121726] hover:bg-[#1f2a3d] rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+                className="w-full h-[120px] flex-shrink-0 p-5 bg-[#121726] hover:bg-[#1f2a3d] rounded-lg transition-all duration-200 hover:-translate-y-0.5 overflow-hidden"
                 onClick={() => openModal(note)}
               >
-                <div className="flex w-full justify-between gap-4 items-center px-4">
+                <div className="flex w-full justify-between gap-4 items-start px-4">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -196,11 +195,11 @@ function Notes() {
                       {note.title}
                     </h1>
 
-                    <p className="mt-1 text-sm text-gray-400 line-clamp-2">
+                    <p className="mt-1 text-sm text-gray-400 line-clamp-1">
                       {note.content}
                     </p>
 
-                    <p className="text-sm mt-2 text-xs md:text-sm text-gray-400">
+                    <p className="mt-2 text-xs md:text-sm text-gray-400">
                       {new Date(note.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -250,7 +249,7 @@ function Notes() {
             <div className="flex items-center">
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex px-2 flex row gap-2 text-xl text-white cursor-pointer hover:text-[#1f2a3d]"
+                className="flex px-2 flex-row gap-2 text-xl text-white cursor-pointer hover:text-[#1f2a3d]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -271,7 +270,6 @@ function Notes() {
               </button>
 
               <button
-                value="Submit"
                 type="submit"
                 className="flex justify-center h-10 w-19 px-2 flex ml-auto items-center rounded-md text-xl text-white bg-indigo-700 gap-2 cursor-pointer p-4 hover:bg-[#1f2a3d]"
               >

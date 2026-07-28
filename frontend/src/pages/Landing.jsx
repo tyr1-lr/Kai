@@ -18,7 +18,7 @@ function Landing() {
         <h1 className="text-purple-400 text-3xl sm:text-5xl lg:text-7xl font-bold">
           AI Workspace
         </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-white w-full max-w-full mt-6 leading-7 text-white/85">
+        <p className="text-base sm:text-lg lg:text-xl w-full max-w-full mt-6 leading-7 text-white/85">
           Organize your tasks, notes, and goals with an AI assistant that helps
           you learn, study, and stay productive.
         </p>
@@ -43,7 +43,11 @@ function Landing() {
         </p>
       </div>
       <div className="hidden lg:flex flex-1 items-center justify-center">
-        <img src={iconMain} alt="Kai workspace" className="w-full max-w-4xl" />
+        <img
+          src={iconMain}
+          alt="Kai workspace"
+          className="w-full max-w-2xl xl:max-w-3xl"
+        />
       </div>
     </div>
   );

@@ -16,6 +16,22 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Python virtual environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -29,3 +45,6 @@ coverage/
 
 # optional
 *.local
+
+# Jupyter
+.ipynb_checkpoints/

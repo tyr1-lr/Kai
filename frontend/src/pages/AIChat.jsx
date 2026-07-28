@@ -14,10 +14,7 @@ function AIChat() {
     try {
       const response = await api.get("api/chats/");
 
-      console.log(Array.isArray(response.data));
-      console.log(response.data);
-
-      return response.data; // <-- this is the fix
+      return response.data;
     } catch (error) {
       console.log(error);
       return [];
@@ -28,30 +25,15 @@ function AIChat() {
     const loadChats = async () => {
       const chats = await getChats();
 
-      console.log("Loaded chats:", chats);
       setChats(chats);
     };
 
     loadChats();
   }, []);
 
-  const sendMessage = async (message) => {
-    try {
-      const response = await api.post(`api/chats/${activeChatId}/send/`, {
-        message,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const getMessages = async (chatId) => {
     try {
       const response = await api.get(`api/chats/${chatId}/messages/`);
-
-      console.log(response.data);
 
       return response.data;
     } catch (error) {
@@ -149,9 +131,6 @@ function AIChat() {
     setLoading(false);
   };
 
-  console.log("Chats:", chats);
-  console.log("Messages:", messages);
-
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
       <div className="h-16 sm:h-20 flex items-center px-3 sm:px-6">
@@ -159,10 +138,6 @@ function AIChat() {
         <div>
           <h1 className="text-white text-base sm:text-xl flex items-center gap-2">
             Kai AI
-            <div className="text-green-400 text-[11px] md:text-xs mt-1 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-              <span className="text-xs sm:text-sm">Online</span>
-            </div>
           </h1>
           <p className="text-white flex items-center text-[10px] sm:text-xs gap-1 mt-1">
             Powered by Gemini 2.5 Flash

@@ -108,8 +108,6 @@ function ResetPassword() {
         navigate("/login");
       }, 1500);
     } catch (err) {
-      console.error(err);
-
       setError(
         err.response?.data?.error ||
           err.response?.data?.message ||
@@ -143,8 +141,6 @@ function ResetPassword() {
 
       setCountdown(60);
     } catch (err) {
-      console.error(err);
-
       setError(
         err.response?.data?.error ||
           err.response?.data?.message ||

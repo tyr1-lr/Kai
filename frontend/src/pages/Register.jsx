@@ -188,7 +188,7 @@ function Register({ route }) {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
                 {error}
               </div>
             )}
@@ -196,7 +196,7 @@ function Register({ route }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
+              className="h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">

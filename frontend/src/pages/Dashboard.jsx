@@ -28,17 +28,11 @@ function Dashboard() {
       setNotes(noteRes.data);
       setGoals(goalRes.data);
       setChats(chatRes.data);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   useEffect(() => {
     loadDashboard();
-
-    loadNotifications();
-
-    checkNotificationsNow();
   }, []);
 
   const hour = new Date().getHours();
@@ -59,9 +53,7 @@ function Dashboard() {
       setNotifications(response.data);
 
       setUnreadCount(response.data.filter((n) => !n.is_read).length);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   const checkNotificationsNow = async () => {
@@ -69,9 +61,7 @@ function Dashboard() {
       await api.get("api/notifications/check/");
 
       await loadNotifications();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -91,9 +81,7 @@ function Dashboard() {
       await api.patch(`api/notifications/read/${id}/`);
 
       await loadNotifications();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   const handleReadAll = async () => {
@@ -101,9 +89,7 @@ function Dashboard() {
       await api.patch("api/notifications/read-all/");
 
       await loadNotifications();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id) => {
@@ -111,9 +97,7 @@ function Dashboard() {
       await api.delete(`api/notifications/delete/${id}/`);
 
       await loadNotifications();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch {}
   };
 
   let greeting;
@@ -158,71 +142,69 @@ function Dashboard() {
 
           {showNotifications && (
             <div className="absolute right-0 top-full mt-3 mt-3 w-[90vw] max-w-sm md:w-96 bg-[#131A29] rounded-xl shadow-2xl border border-[#263248] z-50">
-              <div className="absolute right-0 top-full mt-3 mt-3 w-[90vw] max-w-sm md:w-96 bg-[#131A29] rounded-xl shadow-2xl border border-[#263248] z-50">
-                <div className="flex items-center justify-between p-4 border-b border-[#263248]">
-                  <h2 className="text-white font-semibold text-lg">
-                    Notifications
-                  </h2>
+              <div className="flex items-center justify-between p-4 border-b border-[#263248]">
+                <h2 className="text-white font-semibold text-lg">
+                  Notifications
+                </h2>
 
-                  <button
-                    onClick={handleReadAll}
-                    className="text-indigo-400 hover:text-indigo-300 text-sm"
-                  >
-                    Mark all read
-                  </button>
-                </div>
+                <button
+                  onClick={handleReadAll}
+                  className="text-indigo-400 hover:text-indigo-300 text-sm"
+                >
+                  Mark all read
+                </button>
+              </div>
 
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-gray-400">
-                      No notifications
-                    </div>
-                  ) : (
-                    notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        onClick={() => handleRead(notification.id)}
-                        className={`p-4 border-b border-[#263248] cursor-pointer hover:bg-[#1f2a3d]
+              <div className="max-h-96 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-gray-400">
+                    No notifications
+                  </div>
+                ) : (
+                  notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      onClick={() => handleRead(notification.id)}
+                      className={`p-4 border-b border-[#263248] cursor-pointer hover:bg-[#1f2a3d]
                                             ${!notification.is_read ? "bg-[#1A2233]" : ""}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-white font-semibold">
-                              {notification.title}
-                            </h3>
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-white font-semibold">
+                            {notification.title}
+                          </h3>
 
-                            <p className="text-gray-300 text-sm mt-1">
-                              {notification.message}
-                            </p>
+                          <p className="text-gray-300 text-sm mt-1">
+                            {notification.message}
+                          </p>
 
-                            <span className="text-xs text-gray-500 mt-2 block">
-                              Just now
-                            </span>
-                          </div>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(notification.id);
-                            }}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            🗑
-                          </button>
+                          <span className="text-xs text-gray-500 mt-2 block">
+                            Just now
+                          </span>
                         </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(notification.id);
+                          }}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          🗑
+                        </button>
                       </div>
-                    ))
-                  )}
-                </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
         </div>
 
         <img
-          src={profile?.profile_image || defaultProfile}
+          src={profile?.avatar || defaultProfile}
           alt="Profile"
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
         />
         <span className="hidden sm:block font-bold">{profile?.username}</span>
       </nav>
@@ -359,7 +341,6 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 px-4 md:px-8 lg:px-16 mt-6 mb-6">
-        {" "}
         <div className="bg-[#131A29] rounded-xl flex flex-col">
           <div className="flex flex-grow p-4 border-b border-[#263248]">
             <h1 className=" mt-1 text-lg text-white">Recent Tasks</h1>
@@ -466,7 +447,6 @@ function Dashboard() {
             <NavLink
               to="/dashboard/notes"
               className="ml-auto text-lg text-indigo-500 hover:text-indigo-300 hover:translate-x-1 transition-all"
-              href="#"
             >
               View all
             </NavLink>
@@ -475,6 +455,7 @@ function Dashboard() {
           <ul>
             {notes.slice(0, 3).map((note) => (
               <li
+                key={note.id}
                 onClick={() =>
                   navigate("/dashboard/notes", {
                     state: {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAsyncError, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import api from "../api";
 
 function Tasks() {
@@ -24,7 +24,6 @@ function Tasks() {
       .then((res) => res.data)
       .then((data) => {
         setTasks(data);
-        console.log(data);
       })
       .catch((err) => alert(err));
   };
@@ -197,7 +196,6 @@ function Tasks() {
         </button>
       </div>
       <ul className="flex px-4 md:px-8 w-full h-[calc(100vh-230px)] overflow-y-auto overflow-x-hidden flex-col text-white gap-2 rounded-md">
-        {" "}
         {filteredTasks.map((task) => {
           let priorityColor;
 
@@ -216,7 +214,6 @@ function Tasks() {
               onClick={() => openModal(task)}
             >
               <div className="flex w-full justify-between items-center gap-3 min-w-0">
-                {" "}
                 <input
                   type="checkbox"
                   className="h-5 w-5 shrink-0 accent-red-500 cursor-pointer"
@@ -236,7 +233,6 @@ function Tasks() {
                     <span className="text-1xl">Due: {task.due_date}</span>
                   </div>
                   <div className="flex flex-col items-end gap-3 shrink-0">
-                    {" "}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -276,14 +272,12 @@ function Tasks() {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          {" "}
           <form
             onSubmit={selectedTask ? editTask : createTask}
             className="w-[95%] sm:w-[500px] lg:w-[800px] max-h-[90vh] overflow-y-auto border border-[#40424C] bg-[#121726] rounded-lg px-3 sm:px-4 md:px-6 flex flex-col pt-4 sm:pt-6"
           >
             <div className="flex flex-row ">
               <h1 className="text-white text-lg sm:text-xl lg:text-2xl font-bold px-4 items-center flex">
-                {" "}
                 {selectedTask ? "Edit Task" : "Create New Task"}
               </h1>
               <button

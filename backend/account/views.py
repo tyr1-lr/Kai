@@ -17,6 +17,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 User = get_user_model()
@@ -40,6 +41,8 @@ class CurrentUserView(generics.RetrieveAPIView):
 class UpdateProfileView(generics.UpdateAPIView):
     serializer_class = UpdateProfileSerializer
     permission_classes = [IsAuthenticated]
+
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_object(self):
         return self.request.user

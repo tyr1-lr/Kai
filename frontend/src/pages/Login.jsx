@@ -57,7 +57,7 @@ function Login({ route }) {
 
   return (
     <div
-      className="min-h-full bg-[#010110] flex items-center justify-center px-6 py-10"
+      className="min-h-full bg-[#010110] flex items-center justify-center px-2 py-4"
       style={{
         fontFamily: "'Manrope', sans-serif",
         fontWeight: 700,
@@ -76,7 +76,7 @@ function Login({ route }) {
             </h1>
           </div>
 
-          <div className="mt-4 text-center">
+          <div className="mt-2 text-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
               Welcome Back!
             </h1>
@@ -86,7 +86,7 @@ function Login({ route }) {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="w-full max-w-lg mt-8">
+          <form onSubmit={handleSubmit} className="w-full max-w-lg mt-4">
             <div>
               <label className="text-white">Email</label>
 
@@ -102,7 +102,7 @@ function Login({ route }) {
               />
             </div>
 
-            <div className="mt-5">
+            <div className="mt-4">
               <div className="flex justify-between items-center">
                 <label className="text-white">Password</label>
 
@@ -119,31 +119,29 @@ function Login({ route }) {
                 </NavLink>
               </div>
 
-              <div>
-                <div className="relative mt-2">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    disabled={loading}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
-                  />
+              <div className="relative mt-2">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  disabled={loading}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border border-white/20 bg-[#0D1020] p-3 pr-12 text-white outline-none focus:border-violet-500 disabled:bg-[#111827] disabled:cursor-not-allowed"
+                />
 
-                  <button
-                    type="button"
-                    disabled={loading}
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -174,7 +172,7 @@ function Login({ route }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
+              className="mt-4 h-12 w-full rounded-lg bg-violet-700 font-semibold text-white transition hover:bg-violet-800 disabled:opacity-60"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">

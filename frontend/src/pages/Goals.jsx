@@ -4,14 +4,13 @@ import {
   BriefcaseBusiness,
   WalletMinimal,
   Sprout,
-  Pencil,
   Trash2,
 } from "lucide-react";
 import api from "../api";
 
 function Goals() {
   const [goals, setGoals] = useState([]);
-  const [filter, setFilter] = useState("ALL");
+  const [filter, setFilter] = useState("All");
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -54,15 +53,13 @@ function Goals() {
     getGoals();
   }, []);
 
-  const getGoals = () => {
-    api
-      .get("/api/goals/")
-      .then((res) => res.data)
-      .then((data) => {
-        setGoals(data);
-        console.log(data);
-      })
-      .catch((err) => alert(err));
+  const getGoals = async () => {
+    try {
+      const res = await api.get("/api/goals/");
+      setGoals(res.data);
+    } catch {
+      alert("Failed to load goals.");
+    }
   };
 
   const deleteGoal = async (id) => {
@@ -75,8 +72,7 @@ function Goals() {
       } else {
         alert("Failed to delete goal.");
       }
-    } catch (err) {
-      console.log(err.response?.data);
+    } catch {
       alert("Failed to delete goal.");
     }
   };
@@ -103,8 +99,8 @@ function Goals() {
 
       setIsOpen(false);
       getGoals();
-    } catch (err) {
-      console.log(err.response?.data);
+    } catch {
+      alert("Failed to create goal.");
     }
   };
 
@@ -132,10 +128,7 @@ function Goals() {
       setIsOpen(false);
       getGoals();
     } catch (err) {
-      console.log(err);
-      console.log(err.response);
-      console.log(err.response?.data);
-      alert(JSON.stringify(err.response?.data));
+      alert("Failed to update goal.");
     }
   };
 
@@ -338,7 +331,7 @@ function Goals() {
         </div>
       </div>
 
-      <div className="h-20 px-4 flex items-center items-start h-full flex-col gap-4">
+      <div className="flex flex-col gap-4 w-full px-4 md:px-8 mt-4">
         <div className="flex flex-wrap gap-6 mt-5 px-4 md:px-8">
           <button
             onClick={() => setFilter("All")}
@@ -374,8 +367,8 @@ function Goals() {
           </button>
         </div>
 
-        <div className="h-[calc(100vh-340px)] overflow-y-auto px-4 md:px-8">
-          <ul className="flex w-full flex-col gap-3 text-white">
+        <div className="w-full h-[calc(100vh-340px)] overflow-y-auto px-4 md:px-8">
+          <ul className="w-full flex flex-col gap-3 text-white">
             {goals
               .filter((goal) => {
                 if (filter === "Active") {
@@ -424,7 +417,7 @@ function Goals() {
                 return (
                   <li
                     key={goal.id}
-                    className="w-full rounded-lg bg-[#121726] p-2 sm:p-4 hover:bg-[#1f2a3d]"
+                    className="w-full rounded-lg bg-[#121726] p-3 hover:bg-[#1f2a3d]"
                     onClick={() => openModal(goal)}
                   >
                     <div className="w-full flex flex-row items-center gap-3 px-1 sm:px-3 py-2 cursor-pointer">
@@ -511,7 +504,7 @@ function Goals() {
               onSubmit={selectedGoal ? editGoal : createGoal}
               className="w-full h-full sm:h-[90vh] overflow-y-auto bg-[#121726] rounded-lg"
             >
-              <div className="flex flex-row items-center justify-center px-2">
+              <div className="flex flex-row items-center justify-center px-2 ">
                 <h1 className="text-white text-lg font-bold px-4 items-center flex mt-4">
                   {selectedGoal ? "Edit Goal" : "Create New Goal"}
                 </h1>
@@ -670,7 +663,7 @@ function Goals() {
                   </div>
 
                   <div className="flex flex-col gap-2 p-4 min-h-[180px] max-h-[350px] overflow-y-auto">
-                    {formData.milestones.map((milestone, index) => (
+                    {formData.milestones.map((milestone) => (
                       <div
                         key={milestone.id}
                         className="flex items-center gap-2 bg-[#0D1020] border border-[#40424C] rounded p-2"
@@ -692,6 +685,7 @@ function Goals() {
 
                         <input
                           value={milestone.title}
+                          className="text-white bg-[#0D1020] border border-[#40424C] rounded px-2 py-1 w-full"
                           onChange={(e) => {
                             setFormData((prev) => ({
                               ...prev,
@@ -709,7 +703,7 @@ function Goals() {
                             size={18}
                             onClick={async () => {
                               if (!milestone.isNew) {
-                                await deleteMilestone(milestone.id);
+                                await editMilestone(milestone.id, milestone);
                               }
 
                               setFormData((prev) => ({
@@ -727,10 +721,10 @@ function Goals() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 p-4 mt-4 border-t border-[#2A3145]">
+              <div className="grid grid-cols-2 gap-4 p-4 mt-2 border-t border-[#2A3145]">
                 <button
                   type="button"
-                  className="w-full h-16 text-white border cursor-pointer border-[#40424C] rounded hover:bg-[#1f2a3d] "
+                  className="w-full h-14 text-white border cursor-pointer border-[#40424C] rounded hover:bg-[#1f2a3d] "
                   onClick={() => setIsOpen(false)}
                 >
                   Cancel

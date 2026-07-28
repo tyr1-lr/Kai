@@ -1,4 +1,3 @@
-import iconMain from "../assets/icon.png";
 import {
   ListChecks,
   NotebookPen,
@@ -21,7 +20,7 @@ function Features() {
         <div className="flex flex-col items-center justify-center py-16">
           <div className="flex flex-col max-w-2xl w-full justify-center items-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-center leading-tight">
-              Powerful features, all in{" "}
+              Powerful features, all in
               <span className="text-purple-500">one workspace.</span>
             </h1>
             <p className="text-base mt-4 text-center text-purple-200 max-w-md w-full">
